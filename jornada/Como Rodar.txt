@@ -1,0 +1,73 @@
+1. Instalar o Node.js
+
+O Node é o que permite rodar o npm.
+
+Acesse https://nodejs.org
+
+Baixe a versão LTS (recomendada)
+
+Instale normalmente (próximo → próximo → concluir)
+
+Depois de instalado, abra o terminal e digite:
+
+node -v
+npm -v
+
+
+→ Se aparecer algo como v20.10.0 e 10.5.0, está tudo certo ✅
+
+💻 2. Instalar o Git
+
+Você precisa do Git para clonar o repositório.
+
+Acesse https://git-scm.com/downloads
+
+Baixe e instale (padrões normais já servem)
+
+Verifique se deu certo:
+
+git --version
+
+🧬 3. Clonar o repositório
+
+Agora vamos baixar o código do projeto.
+
+Vá até o repositório no GitHub
+
+Clique em “Code” → HTTPS → copiar o link
+Exemplo: https://github.com/usuario/nome-do-repo.git
+
+No terminal, escolha uma pasta (ex: Documentos) e digite:
+
+cd Documentos
+git clone https://github.com/usuario/nome-do-repo.git
+
+
+Entre na pasta do projeto:
+
+cd nome-do-repo
+
+📦 4. Instalar as dependências
+
+Antes de rodar o projeto, instale tudo que ele precisa:
+
+npm install
+
+
+⚠️ Isso pode demorar um pouco na primeira vez.
+(Se der erro, tente npm install --force.)
+
+⚙️ 5. Rodar o projeto
+
+Depois de tudo instalado:
+
+npm run dev
+
+
+O terminal vai mostrar algo como:
+
+> vite
+Local:   http://localhost:5173/
+
+
+Acesse esse endereço no navegador → 🌐 e o site vai abrir!
