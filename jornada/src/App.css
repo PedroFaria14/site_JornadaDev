@@ -1,8 +1,26 @@
-/* Adicione isso ao topo do seu index.css */
-html,
-body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
+/* src/pages/paginaInicial/index.css */
+
+.home-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; 
+  width: 100vw;
+  /* Fundo gradiente padrão */
+  background: linear-gradient(to bottom, #1e293b 0%, #0f172a 100%); 
+  font-family: "Poppins", sans-serif;
+}
+
+.home-content {
+  flex-grow: 1; /* Ocupa o espaço do meio */
+  /* Centraliza o conteúdo */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centraliza verticalmente (aproximado) */
+  align-items: center;     /* Centraliza horizontalmente */
+
+  padding: 20px;
+
+  /* Deixa espaço para o rodapé */
+  padding-bottom: 80px; 
+  overflow-y: auto; /* Permite rolagem */
 }

@@ -6,6 +6,11 @@ import PaginaInicial from "./pages/paginaInicial";
 import ProtectedRoute from "./components/protectedRoute";
 import ForgotPasswordPage from "./pages/forgotPassword/index"
 import ResetPasswordPage from "./pages/resetPassword/index"
+import PaginaModulo from "./pages/PaginaModulo/index"
+import PaginaPerfil from "./pages/perfil/index"
+import PaginaEditarPerfil from "./pages/editar/index";
+import PaginaConfiguracoes from "./pages/config/index"
+
 
 export default function App() {
   return (
@@ -22,7 +27,10 @@ export default function App() {
           <Route path="/" element={<PaginaInicial />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} /> 
           <Route path="/reset-password" element={<ResetPasswordPage />} /> 
-          
+          <Route path="/modulo" element={<PaginaModulo />} /> 
+          <Route path="/perfil" element={<PaginaPerfil />} />
+          <Route path="/perfil/editar" element={<PaginaEditarPerfil/>} />
+          <Route path="/configuracoes" element={<PaginaConfiguracoes />} /> 
       
         </Route>
         

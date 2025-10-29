@@ -47,7 +47,7 @@ export default function LoginPage() {
 
         localStorage.setItem("userData", JSON.stringify(result.user));
         
-        navigate("/paginaInicial"); 
+        navigate("/modulo"); 
 
       } else {
         throw new Error(result.message || "Erro desconhecido no login.");
