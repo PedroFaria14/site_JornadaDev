@@ -44,31 +44,61 @@ export default function RegisterPage() {
       return;
     }
 
-    const { confirmarSenha, ...dataToSend } = formData;
+    // 1. Prepara os dados para o REGISTRO
+    const { confirmarSenha, ...registerData } = formData;
 
     try {
-      const response = await fetch(`${API_URL}/register`, {
+      // --- ETAPA 1: REGISTRAR A CONTA ---
+      const registerResponse = await fetch(`${API_URL}/register`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(dataToSend),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(registerData),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!registerResponse.ok) {
+        const errorData = await registerResponse.json();
         throw new Error(errorData.detail || "Falha ao registrar.");
       }
-
-      const result = await response.json();
-      console.log("Registro bem-sucedido:", result.message);
       
-      alert("Conta criada com sucesso! Faça o login.");
-      navigate("/login"); 
+      console.log("Conta criada com sucesso. Fazendo auto-login...");
+
+      // --- ETAPA 2: FAZER LOGIN PARA SALVAR OS DADOS LOCALMENTE ---
+      const loginResponse = await fetch(`${API_URL}/login`, {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({
+           email: formData.email,
+           senha: formData.senha,
+         }),
+      });
+
+      if (!loginResponse.ok) {
+         throw new Error("Conta criada, mas falha ao fazer login. Tente logar manualmente.");
+      }
+
+      const loginResult = await loginResponse.json();
+
+      if (loginResult.success && loginResult.user) {
+        // 👇 ESTA É A LINHA CRÍTICA QUE FALTAVA
+        localStorage.setItem("userData", JSON.stringify(loginResult.user));
+        
+        console.log("Login automático bem-sucedido, navegando para o teste.");
+        alert("Conta criada com sucesso! Vamos começar seu teste de nível.");
+        
+        // Agora sim, a navegação vai funcionar
+        navigate("/teste-nivelamento"); 
+
+      } else {
+        throw new Error("Conta criada, mas dados de login não retornados.");
+      }
 
     } catch (error) {
-      console.error("Erro ao registrar:", error);
+      console.error("Erro no processo de registro:", error);
       alert(`Erro: ${error.message}`);
+      // Se algo der errado, manda para o login
+      if (error.message.includes("Tente logar manualmente")) {
+        navigate("/login");
+      }
     }
   };
 

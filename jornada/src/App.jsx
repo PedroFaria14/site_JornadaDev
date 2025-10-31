@@ -13,7 +13,7 @@ import PaginaConfiguracoes from "./pages/config/index"
 import PaginaDicas from "./pages/dicas/index"
 import PaginaQuiz from "./pages/quiz/index"
 import PaginaExercicios from "./pages/exercicios/index";
-
+import PaginaNivelamento from "./pages/teste_nivelamento/index"
 
 export default function App() {
   return (
@@ -38,6 +38,7 @@ export default function App() {
           <Route path="/perfil/editar" element={<PaginaEditarPerfil/>} />
           <Route path="/configuracoes" element={<PaginaConfiguracoes />} /> 
           <Route path="/dicas" element={<PaginaDicas />} /> 
+          <Route path="/teste-nivelamento" element={<PaginaNivelamento />} />
           <Route path="/quiz/:moduleName/:levelId" element={<PaginaQuiz />} /> 
           <Route path="/exercicios" element={<PaginaExercicios />} />
         </Route>

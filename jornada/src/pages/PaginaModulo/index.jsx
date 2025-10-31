@@ -19,7 +19,7 @@ import {
   ListAlt as ExerciciosIcon,
   OndemandVideo as DicasIcon,
   Person as PerfilIcon,
-  ArrowBack as BackIcon,
+ 
 } from "@mui/icons-material";
 import { useNavigate, useParams } from "react-router-dom";
 import "./index.css";
@@ -81,9 +81,7 @@ export default function Paginamenu() {
   navigate(`/exercicios`); 
 };
 
-  const handleGoBack = () => {
-    navigate("/exercicios"); 
-  };
+  
 
   return (
     <Box className="perfil-layout">
@@ -96,13 +94,11 @@ export default function Paginamenu() {
         }}
       >
         <Toolbar>
-          <IconButton color="inherit" onClick={handleGoBack} sx={{ mr: 1 }}>
-            <BackIcon />
-          </IconButton>
+          
           <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
             Menu
           </Typography>
-          <IconButton color="inherit" onClick={() => alert("Configurações!")}>
+          <IconButton color="inherit" onClick={() => navigate("/configuracoes")}>
             <Settings />
           </IconButton>
           <IconButton color="inherit" onClick={handleLogout}>

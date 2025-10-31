@@ -6,6 +6,7 @@ import {
 import {
   Settings, Logout, Home as HomeIcon, ListAlt as ExerciciosIcon,
   OndemandVideo as DicasIcon, Person as PerfilIcon, School as ModuloIcon,
+   ArrowBack as BackIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import "./index.css"
@@ -30,6 +31,10 @@ export default function PaginaExercicios() {
       navigate("/login");
     }
   }, [navigate]);
+
+  const handleGoBack = () => {
+    navigate("/menu"); 
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("userData");
@@ -61,6 +66,10 @@ export default function PaginaExercicios() {
       {/* --- CABEÇALHO --- */}
       <AppBar position="static" sx={{ background: "#1e293b", boxShadow: 'none' }}>
         <Toolbar>
+
+          <IconButton color="inherit" onClick={handleGoBack} sx={{ mr: 1 }}>
+                      <BackIcon />
+                    </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
             Olá, {userData?.nome?.split(" ")[0] || "Usuário"}
           </Typography>

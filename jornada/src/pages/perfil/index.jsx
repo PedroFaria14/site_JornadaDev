@@ -77,35 +77,41 @@ export default function PaginaPerfil() {
       return;
     }
     
+    // 1. 👇 CARREGA OS DADOS DO LOCALSTORAGE IMEDIATAMENTE
+    // Isso garante que o "intermediario" (que o teste salvou) apareça NA HORA.
     const user = JSON.parse(data);
+    setProfileData(user);
+    setFasesCompletas(calculateCompletedPhases(user.fases));
+    setLoading(false); // Para de carregar
+    
     const userEmail = user.email;
 
-    const fetchProfile = async () => {
+    // 2. 👇 AGORA, BUSCA ATUALIZAÇÕES EM SEGUNDO PLANO
+    // (Apenas para garantir que os dados fiquem sincronizados com o banco)
+    const fetchProfileUpdates = async () => {
+      console.log("Buscando atualizações do perfil em segundo plano...");
       try {
         const response = await fetch(`${API_URL}/profile/${userEmail}`);
-        
         if (!response.ok) {
-          throw new Error("Falha ao buscar perfil.");
+          throw new Error("Falha ao buscar atualizações.");
         }
         
         const result = await response.json();
         
         if (result.success && result.user) {
+          // 3. Atualiza o state e o localStorage com os dados mais recentes do banco
           setProfileData(result.user);
           localStorage.setItem("userData", JSON.stringify(result.user));
-          
           setFasesCompletas(calculateCompletedPhases(result.user.fases));
-        } else {
-          throw new Error(result.message || "Erro ao carregar dados.");
+          console.log("Perfil em segundo plano atualizado.", result.user);
         }
       } catch (error) {
-        console.error("Erro ao buscar perfil:", error);
-        alert("Erro ao carregar perfil: " + error.message);
+        console.error("Erro ao buscar atualizações do perfil:", error);
+        // Não faz nada se falhar, fica com os dados locais que já carregamos
       }
-      setLoading(false);
     };
 
-    fetchProfile();
+    fetchProfileUpdates(); // Chama a busca em segundo plano
   }, [navigate]);
 
   const handleLogout = () => {
