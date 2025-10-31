@@ -40,8 +40,6 @@ import "./index.css"
 
 const API_URL = "https://projeto-codepath.onrender.com";
 
-// --- NOVA FUNÇÃO ---
-// 1. Helper para calcular fases concluídas
 const calculateCompletedPhases = (fases) => {
   let total = 0;
   let completed = 0;
@@ -50,22 +48,19 @@ const calculateCompletedPhases = (fases) => {
     return "0/0";
   }
 
-  // Itera sobre cada módulo (ex: "Condicionais")
   for (const moduleName in fases) {
     const moduleFases = fases[moduleName];
     if (Array.isArray(moduleFases)) {
       total += moduleFases.length;
-      // Conta as fases que estão liberadas E não são a fase atual
       completed += moduleFases.filter(fase => fase.liberada && !fase.atual).length;
     }
   }
-  // (Pequeno ajuste: a fase 'atual' também conta como "completa" em progresso)
-  // Se você quiser contar SÓ as finalizadas, remova o '+1'
+
   const finalCompleted = completed > 0 ? completed + 1 : 0; 
   
   return `${finalCompleted}/${total}`;
 };
-// --- FIM DA NOVA FUNÇÃO ---
+
 
 export default function PaginaPerfil() {
   const navigate = useNavigate();
@@ -73,7 +68,6 @@ export default function PaginaPerfil() {
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
   
-  // 2. Novo estado para o total de fases
   const [fasesCompletas, setFasesCompletas] = useState("0/0");
 
   useEffect(() => {
@@ -88,7 +82,6 @@ export default function PaginaPerfil() {
 
     const fetchProfile = async () => {
       try {
-        // A lógica de busca está 100% CORRETA
         const response = await fetch(`${API_URL}/profile/${userEmail}`);
         
         if (!response.ok) {
@@ -101,7 +94,6 @@ export default function PaginaPerfil() {
           setProfileData(result.user);
           localStorage.setItem("userData", JSON.stringify(result.user));
           
-          // 3. ATUALIZAÇÃO: Chama a função helper
           setFasesCompletas(calculateCompletedPhases(result.user.fases));
         } else {
           throw new Error(result.message || "Erro ao carregar dados.");
@@ -122,16 +114,15 @@ export default function PaginaPerfil() {
   };
 
   const handleUpdateProfile = () => {
-    navigate("/perfil/editar"); // Navega para a página de edição
+    navigate("/perfil/editar"); 
   };
 
   const handleGoBack = () => {
-    navigate("/modulo"); 
+    navigate("/menu/"); 
   };
 
   return (
     <Box className="home-layout">
-      {/* --- 1. CABEÇALHO (NAV SUPERIOR) --- */}
       <AppBar position="static" 
         sx={{ 
           background: "linear-gradient(to right, #1e293b, #334155)",
@@ -151,7 +142,6 @@ export default function PaginaPerfil() {
         </Toolbar>
       </AppBar>
 
-      {/* --- CONTEÚDO CENTRAL REDESENHADO --- */}
       <Box 
         className="perfil-content" 
         sx={{ 
@@ -166,7 +156,6 @@ export default function PaginaPerfil() {
           <CircularProgress color="success" sx={{ mt: 5 }} />
         ) : profileData ? (
           <>
-            {/* --- Seção da Foto e Nome --- */}
             <Box sx={{ textAlign: 'center', mb: 4 }}>
               <Avatar 
                 alt={profileData.nome} 
@@ -201,7 +190,6 @@ export default function PaginaPerfil() {
               </Button>
             </Box>
 
-            {/* --- Card de Estatísticas --- */}
             <Card sx={{ 
                 width: '90%', maxWidth: 400, mb: 4,
                 background: "rgba(30, 41, 59, 0.9)",
@@ -226,14 +214,12 @@ export default function PaginaPerfil() {
                 <Divider orientation="vertical" flexItem sx={{ bgcolor: 'rgba(255,255,255,0.2)' }} />
                 <Box sx={{ textAlign: 'center', flex: 1 }}>
                   <FasesIcon sx={{ fontSize: 30, color: '#38b36d' }} />
-                  {/* 4. ATUALIZAÇÃO: Mostra o valor calculado */}
                   <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{fasesCompletas}</Typography>
                   <Typography variant="caption" sx={{ color: '#b0bec5' }}>Fases</Typography>
                 </Box>
               </CardContent>
             </Card>
 
-            {/* --- Detalhes do Perfil (Lista) --- */}
             <Card sx={{ 
                 width: '90%', maxWidth: 400, mb: 4,
                 background: "rgba(30, 41, 59, 0.9)",
@@ -245,7 +231,6 @@ export default function PaginaPerfil() {
             }}>
               <CardContent sx={{ p: 0 }}>
                 <List>
-                  {/* 5. ATUALIZAÇÃO: Adicionado 'Data de Nascimento' */}
                   <ListItem>
                     <ListItemText 
                       primary="Data de Nascimento" 
@@ -286,7 +271,7 @@ export default function PaginaPerfil() {
         )}
       </Box>
 
-      {/* --- 3. RODAPÉ (NAV INFERIOR) --- */}
+     
       <Paper 
         sx={{ 
           position: 'fixed', bottom: 0, left: 0, right: 0,
@@ -296,13 +281,13 @@ export default function PaginaPerfil() {
       >
         <BottomNavigation
           showLabels
-          value={navValue} // "Perfil" fica ativo
+          value={navValue} 
           onChange={(event, newValue) => {
             setNavValue(newValue);
-            if (newValue === 0) navigate("/modulo");
+            if (newValue === 0) navigate("/menu/");
             if (newValue === 1) navigate("/exercicios");
-            if (newValue === 2) alert("Navegar para Dicas!"); // navigate("/dicas");
-            if (newValue === 3) navigate("/perfil"); // Já está aqui
+            if (newValue === 2) navigate("/dicas");
+            if (newValue === 3) navigate("/perfil"); 
           }}
           sx={{ 
             background: "transparent",

@@ -266,7 +266,7 @@ export default function PaginaEditarPerfil() {
           value={navValue}
           onChange={(event, newValue) => {
             setNavValue(newValue);
-            if (newValue === 0) navigate("/modulo");
+            if (newValue === 0) navigate("/menu/");
             if (newValue === 1) navigate("/exercicios");
             if (newValue === 2) navigate("/dicas");
             if (newValue === 3) navigate("/perfil");
