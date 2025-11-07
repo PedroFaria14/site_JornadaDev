@@ -23,3 +23,9 @@
   background: linear-gradient(to bottom, #1e293b 0%, #0f172a 100%);
   overflow-y: auto;
 }
+
+.MuiListItemButton-root, .MuiListItem-root {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+}
