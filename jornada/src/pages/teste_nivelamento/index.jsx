@@ -1,9 +1,23 @@
 import React, { useState, useEffect } from "react";
 import {
-  Box, AppBar, Toolbar, Typography, Card, CardContent,
-  Button, LinearProgress, CircularProgress, Dialog, DialogTitle,
-  DialogContent, DialogContentText, DialogActions, FormControl,
-  FormControlLabel, Radio, RadioGroup
+  Box,
+  AppBar,
+  Toolbar,
+  Typography,
+  Card,
+  CardContent,
+  Button,
+  LinearProgress,
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  FormControl,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
 } from "@mui/material";
 // 1. IMPORTADO O 'EmojiEvents' (Troféu) para o pop-up final
 import { CheckCircle, Cancel, EmojiEvents as TrophyIcon } from "@mui/icons-material";
@@ -19,20 +33,19 @@ const levelResultsMap = {
   iniciante: {
     title: "Nível Iniciante (1)",
     message: "Você está começando sua jornada agora. Vamos aprender o básico!",
-    color: "#94a3b8" // Cinza
+    color: "#94a3b8", // Cinza
   },
   intermediario: {
     title: "Nível Intermediário (2)",
     message: "Você já tem uma boa base! Vamos aprimorar suas habilidades.",
-    color: "#6ee7b7" // Verde
+    color: "#6ee7b7", // Verde
   },
   avancado: {
     title: "Nível Avançado (3)",
     message: "Impressionante! Você já domina os conceitos. Vamos aos desafios!",
-    color: "#a78bfa" // Roxo
-  }
+    color: "#a78bfa", // Roxo
+  },
 };
-
 
 export default function PaginaNivelamento() {
   const navigate = useNavigate();
@@ -58,12 +71,12 @@ export default function PaginaNivelamento() {
       return;
     }
     const user = JSON.parse(data);
-    setUserData(user); 
+    setUserData(user);
   }, [navigate]);
 
   // 🔹 Busca as perguntas do teste
   useEffect(() => {
-    if (!userData) return; 
+    if (!userData) return;
 
     const fetchTestQuestions = async () => {
       setLoading(true);
@@ -73,12 +86,8 @@ export default function PaginaNivelamento() {
 
         const urlFacil = `${API_URL}/pergunta/?nivel=${nivelFacil}&count=${COUNT_FACIL}`;
         const urlMedio = `${API_URL}/pergunta/?nivel=${nivelMedio}&count=${COUNT_MEDIO}`;
-        
 
-        const [resFacil, resMedio] = await Promise.all([
-           fetch(urlFacil),
-           fetch(urlMedio)
-        ]);
+        const [resFacil, resMedio] = await Promise.all([fetch(urlFacil), fetch(urlMedio)]);
 
         const dataFacil = await resFacil.json();
         const dataMedio = await resMedio.json();
@@ -86,13 +95,13 @@ export default function PaginaNivelamento() {
         let allQuestions = [];
         if (dataFacil.success && dataFacil.perguntas) allQuestions = [...allQuestions, ...dataFacil.perguntas];
         if (dataMedio.success && dataMedio.perguntas) allQuestions = [...allQuestions, ...dataMedio.perguntas];
-        
+
         allQuestions.sort(() => Math.random() - 0.5);
 
         if (allQuestions.length === 0) {
-           console.error("Nenhuma pergunta de nivelamento encontrada!");
-           navigate("/exercicios"); // Navega se não achar perguntas
-           return;
+          console.error("Nenhuma pergunta de nivelamento encontrada!");
+          navigate("/exercicios"); // Navega se não achar perguntas
+          return;
         }
         setQuestions(allQuestions);
       } catch (err) {
@@ -105,7 +114,7 @@ export default function PaginaNivelamento() {
     };
 
     fetchTestQuestions();
-  }, [userData]); 
+  }, [userData]);
 
   const handleAnswerSelect = (e) => setSelectedAnswer(e.target.value);
 
@@ -116,7 +125,7 @@ export default function PaginaNivelamento() {
     const currentQuestion = questions[currentQuestionIndex];
 
     try {
-      const response = await fetch(`${API_URL}/responderSite`, { 
+      const response = await fetch(`${API_URL}/responderSite`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -126,7 +135,7 @@ export default function PaginaNivelamento() {
       });
       const result = await response.json();
       if (result.success) {
-        setScore(prev => prev + 1);
+        setScore((prev) => prev + 1);
       }
       setFeedback(result);
       setShowFeedbackDialog(true);
@@ -143,7 +152,7 @@ export default function PaginaNivelamento() {
     setShowFeedbackDialog(false);
     setSelectedAnswer(null);
     setFeedback(null);
-    
+
     const isLastQuestion = currentQuestionIndex + 1 >= questions.length;
 
     if (isLastQuestion) {
@@ -153,23 +162,21 @@ export default function PaginaNivelamento() {
     }
   };
 
-  
   // 4. FUNÇÃO FINALIZAR (Chama o Backend REAL + Salva Local)
   const handleFinishTest = async () => {
     setLoading(true); // Mostra tela de "Calculando..."
 
     const percentage = (score / questions.length) * 100;
-    let finalLevel = "iniciante"; 
+    let finalLevel = "iniciante";
     let finalLevelNum = 1;
 
     if (percentage === 100) {
-      finalLevel = "avancado"; 
+      finalLevel = "avancado";
       finalLevelNum = 3;
     } else if (percentage >= 50) {
-      finalLevel = "intermediario"; 
+      finalLevel = "intermediario";
       finalLevelNum = 2;
     }
-
 
     let updatedUserData = { ...userData };
 
@@ -180,25 +187,24 @@ export default function PaginaNivelamento() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: userData.email,
-          globalLevel: finalLevel 
+          globalLevel: finalLevel,
         }),
       });
 
       if (!response.ok) {
-         throw new Error("Falha ao salvar nível no backend (continuando localmente)");
-      }
-      
-      const result = await response.json();
-      
-      if (result.success && result.user) {
-         updatedUserData = result.user; // Pega os dados mais recentes do backend
+        throw new Error("Falha ao salvar nível no backend (continuando localmente)");
       }
 
+      const result = await response.json();
+
+      if (result.success && result.user) {
+        updatedUserData = result.user; // Pega os dados mais recentes do backend
+      }
     } catch (error) {
       console.error(error);
       updatedUserData.nivel = finalLevel; // Salva localmente se o backend falhar
-    } 
-    
+    }
+
     // --- ETAPA 2: SALVAR LOCALMENTE (PARA A APRESENTAÇÃO) ---
     updatedUserData.nivel = finalLevel;
 
@@ -206,14 +212,14 @@ export default function PaginaNivelamento() {
     for (const moduleKey in fases) {
       // Não mexe no 'Desafio da Mistura' se ele já tiver progresso
       if (moduleKey !== "Desafio da Roleta") {
-         fases[moduleKey] = finalLevelNum;
+        fases[moduleKey] = finalLevelNum;
       }
     }
-    updatedUserData.fases = fases; 
+    updatedUserData.fases = fases;
 
     localStorage.setItem("userData", JSON.stringify(updatedUserData));
-    setUserData(updatedUserData); 
-    
+    setUserData(updatedUserData);
+
     setTestResult(finalLevel); // Salva o resultado para o pop-up
     setLoading(false);
     setShowResultDialog(true); // 👈 ABRE O POP-UP
@@ -222,18 +228,26 @@ export default function PaginaNivelamento() {
   // 5. Função para o botão do pop-up final
   const handleGoToMenu = () => {
     setShowResultDialog(false);
-    navigate("/exercicios"); // Navega para o menu
+    navigate("/menu"); // Navega para o menu
   };
-
 
   // --- RENDERIZAÇÕES ---
 
   if (loading || !userData || !questions.length) {
     let message = "Carregando seu teste de nível...";
-    if(loading && questions.length > 0) message = "Calculando seu nível...";
-    
+    if (loading && questions.length > 0) message = "Calculando seu nível...";
+
     return (
-      <Box className="perfil-layout" sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", flexDirection: "column" }}>
+      <Box
+        className="perfil-layout"
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          flexDirection: "column",
+        }}
+      >
         <CircularProgress color="success" />
         <Typography sx={{ color: "white", mt: 2 }}>{message}</Typography>
       </Box>
@@ -254,10 +268,20 @@ export default function PaginaNivelamento() {
         </Toolbar>
         <LinearProgress variant="determinate" value={progress} color="success" sx={{ height: "6px" }} />
       </AppBar>
-      
+
       {/* --- Card da Pergunta --- */}
       <Box className="perfil-content" sx={{ justifyContent: "center" }}>
-        <Card sx={{ width: "90%", maxWidth: 700, background: "rgba(18, 25, 49, 0.9)", color: "white", border: "1px solid #334155", borderRadius: "16px", p: { xs: 2, sm: 3 } }}>
+        <Card
+          sx={{
+            width: "90%",
+            maxWidth: 700,
+            background: "rgba(18, 25, 49, 0.9)",
+            color: "white",
+            border: "1px solid #334155",
+            borderRadius: "16px",
+            p: { xs: 2, sm: 3 },
+          }}
+        >
           <CardContent>
             <Typography sx={{ color: "#94a3b8", mb: 2, fontWeight: "bold" }}>
               Pergunta {currentQuestionIndex + 1} de {questions.length}
@@ -274,15 +298,16 @@ export default function PaginaNivelamento() {
                     value={opcao}
                     control={<Radio sx={{ color: "#94a3b8", "&.Mui-checked": { color: "#38b36d" } }} />}
                     label={<Typography sx={{ color: "white" }}>{opcao}</Typography>}
-                   sx={{ // 
-    background: "rgba(255, 255, 255, 0.05)",
-    mb: 1.5,
-    borderRadius: "8px",
-    padding: "8px 16px",
-    // Esta linha muda a borda, em vez do fundo
-    border: selectedAnswer === opcao ? "2px solid #38b36d" : "2px solid transparent",
-    "&:hover": { background: "rgba(255, 255, 255, 0.1)" },
-  }}
+                    sx={{
+                      //
+                      background: "rgba(255, 255, 255, 0.05)",
+                      mb: 1.5,
+                      borderRadius: "8px",
+                      padding: "8px 16px",
+                      // Esta linha muda a borda, em vez do fundo
+                      border: selectedAnswer === opcao ? "2px solid #38b36d" : "2px solid transparent",
+                      "&:hover": { background: "rgba(255, 255, 255, 0.1)" },
+                    }}
                   />
                 ))}
               </RadioGroup>
@@ -317,7 +342,11 @@ export default function PaginaNivelamento() {
         }}
       >
         <DialogTitle sx={{ display: "flex", alignItems: "center", fontWeight: "bold" }}>
-          {feedback?.success ? <CheckCircle sx={{ color: "#38b36d", mr: 1 }} /> : <Cancel sx={{ color: "#dc2626", mr: 1 }} />}
+          {feedback?.success ? (
+            <CheckCircle sx={{ color: "#38b36d", mr: 1 }} />
+          ) : (
+            <Cancel sx={{ color: "#dc2626", mr: 1 }} />
+          )}
           {feedback?.message}
         </DialogTitle>
         <DialogContent>
@@ -333,9 +362,9 @@ export default function PaginaNivelamento() {
           </Button>
         </DialogActions>
       </Dialog>
-      
+
       {/* // 6. 👇 Pop-up de Resultado Final 👇
-      */}
+       */}
       <Dialog
         open={showResultDialog}
         disableEscapeKeyDown // Impede o usuário de fechar clicando fora
@@ -345,12 +374,12 @@ export default function PaginaNivelamento() {
             background: "#111827",
             color: "white",
             border: `2px solid ${levelResultsMap[testResult].color}`, // Borda com a cor do nível
-            p: 2
+            p: 2,
           },
         }}
       >
         <DialogTitle sx={{ fontWeight: "bold", textAlign: "center", fontSize: "1.5rem" }}>
-          <TrophyIcon sx={{ color: levelResultsMap[testResult].color, fontSize: 40, mb: -1, mr: 1 }}/>
+          <TrophyIcon sx={{ color: levelResultsMap[testResult].color, fontSize: 40, mb: -1, mr: 1 }} />
           Teste Finalizado!
         </DialogTitle>
         <DialogContent sx={{ textAlign: "center" }}>
@@ -360,9 +389,7 @@ export default function PaginaNivelamento() {
           <Typography variant="h5" sx={{ fontWeight: "bold", color: levelResultsMap[testResult].color }}>
             {levelResultsMap[testResult].title}
           </Typography>
-           <DialogContentText sx={{ color: "#b0bec5", mt: 1 }}>
-            {levelResultsMap[testResult].message}
-          </DialogContentText>
+          <DialogContentText sx={{ color: "#b0bec5", mt: 1 }}>{levelResultsMap[testResult].message}</DialogContentText>
         </DialogContent>
         <DialogActions sx={{ p: 2, justifyContent: "center" }}>
           <Button

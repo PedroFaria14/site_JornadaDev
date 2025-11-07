@@ -4,7 +4,7 @@ import {
   Button,
   InputAdornment,
   IconButton,
-  Box,        // Importado
+  Box, // Importado
   Typography, // Importado
 } from "@mui/material";
 import { Visibility, VisibilityOff, Email } from "@mui/icons-material";
@@ -22,7 +22,6 @@ export default function LoginPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -32,7 +31,7 @@ export default function LoginPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData), 
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
@@ -43,15 +42,12 @@ export default function LoginPage() {
       const result = await response.json();
 
       if (result.success && result.user) {
-
         localStorage.setItem("userData", JSON.stringify(result.user));
-        
-        navigate("/menu/"); 
 
+        navigate("/menu/");
       } else {
         throw new Error(result.message || "Erro desconhecido no login.");
       }
-      
     } catch (error) {
       console.error("Erro no login:", error);
       alert(`Erro: ${error.message}`);
@@ -77,7 +73,7 @@ export default function LoginPage() {
     <div className="login-container">
       <Box
         sx={{
-          background: "rgba(18, 25, 49, 0.85)", 
+          background: "rgba(18, 25, 49, 0.85)",
           padding: { xs: "30px", sm: "40px 35px" },
           borderRadius: "20px",
           boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
@@ -102,15 +98,15 @@ export default function LoginPage() {
           <TextField
             name="email"
             label="E-mail"
-            variant="filled" 
+            variant="filled"
             fullWidth
             value={formData.email}
             onChange={handleChange}
-            sx={{ ...textInputSx, mb: 2.5 }} 
+            sx={{ ...textInputSx, mb: 2.5 }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Email sx={{ color: iconColor }} /> 
+                  <Email sx={{ color: iconColor }} />
                 </InputAdornment>
               ),
             }}
@@ -120,18 +116,15 @@ export default function LoginPage() {
             name="senha"
             label="Senha"
             type={showPassword ? "text" : "password"}
-            variant="filled" 
+            variant="filled"
             fullWidth
             value={formData.senha}
             onChange={handleChange}
-            sx={{ ...textInputSx, mb: 2.5 }} 
+            sx={{ ...textInputSx, mb: 2.5 }}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton
-                    onClick={() => setShowPassword(!showPassword)}
-                    edge="end"
-                  >
+                  <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
                     {showPassword ? (
                       <VisibilityOff sx={{ color: iconColor }} />
                     ) : (
@@ -143,7 +136,7 @@ export default function LoginPage() {
             }}
           />
 
-         <Typography
+          <Typography
             onClick={() => navigate("/forgot-password")}
             sx={{
               textAlign: "right",
@@ -161,7 +154,7 @@ export default function LoginPage() {
             type="submit"
             variant="contained"
             sx={{
-              backgroundColor: "#38b36d", 
+              backgroundColor: "#38b36d",
               color: "white",
               fontWeight: "bold",
               width: "100%",
@@ -180,13 +173,13 @@ export default function LoginPage() {
             component="span"
             onClick={() => navigate("/register")}
             sx={{
-              color: "#00a86b", 
+              color: "#00a86b",
               fontWeight: "bold",
               cursor: "pointer",
               "&:hover": { color: "#00c77e" },
             }}
           >
-            Crie uma
+            Crie conta
           </Box>
         </Typography>
       </Box>

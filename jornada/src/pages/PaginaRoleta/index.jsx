@@ -7,7 +7,6 @@ import {
   IconButton,
   Button,
   CircularProgress,
-
   Paper,
   BottomNavigation,
   BottomNavigationAction,
@@ -22,7 +21,7 @@ import {
   ArrowBack as BackIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import "./index.css"; // Reutiliza o CSS do PaginaExercicios
+import "./index.css";
 
 // Importa o componente da roleta
 import CustomWheel from "../CustomWheel/index";
@@ -35,11 +34,27 @@ const outerBorderColor = "#38b36d";
 const pointerColor = "#38b36d"; // Cor da seta (do nosso chat anterior)
 
 const roulettePrizes = [
-  {option: "Funções", fullName: "Funções", style: { backgroundColor: colorPalette[0], textColor: textColor } },
-  { option: "Variáveis", fullName: "Variáveis e Tipos de Dados", style: { backgroundColor: colorPalette[1], textColor: textColor } },
-  { option: "Condicionais", fullName: "Condicionais", style: { backgroundColor: colorPalette[2], textColor: textColor } },
-  { option: "Laços", fullName: "Laços de Repetição", style: { backgroundColor: colorPalette[3], textColor: textColor } },
-  { option: "Diversos", fullName: "Perguntas diversas", style: { backgroundColor: colorPalette[4], textColor: textColor } },
+  { option: "Funções", fullName: "Funções", style: { backgroundColor: colorPalette[0], textColor: textColor } },
+  {
+    option: "Variáveis",
+    fullName: "Variáveis e Tipos de Dados",
+    style: { backgroundColor: colorPalette[1], textColor: textColor },
+  },
+  {
+    option: "Condicionais",
+    fullName: "Condicionais",
+    style: { backgroundColor: colorPalette[2], textColor: textColor },
+  },
+  {
+    option: "Laços",
+    fullName: "Laços de Repetição",
+    style: { backgroundColor: colorPalette[3], textColor: textColor },
+  },
+  {
+    option: "Diversos",
+    fullName: "Perguntas diversas",
+    style: { backgroundColor: colorPalette[4], textColor: textColor },
+  },
 ];
 
 // --- Componente da Página ---
@@ -65,7 +80,7 @@ export default function PaginaRoleta() {
 
   // --- Handlers de Navegação (do PaginaExercicios) ---
   const handleGoBack = () => {
-    navigate("/exercicios"); // Volta para a lista de exercícios
+    navigate("/menu");
   };
 
   const handleLogout = () => {
@@ -109,7 +124,7 @@ export default function PaginaRoleta() {
             <BackIcon />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: "bold" }}>
-            Desafio da Roleta 
+            Desafio da Roleta
           </Typography>
           <IconButton color="inherit" onClick={() => navigate("/configuracoes")}>
             <Settings />
@@ -123,7 +138,6 @@ export default function PaginaRoleta() {
       {/* --- CONTEÚDO CENTRAL (Roleta do App.js) --- */}
       {/* Usamos a classe "perfil-content" para centralizar o conteúdo */}
       <Box className="perfil-content" sx={{ paddingBottom: "72px" }}>
-        
         {/* Títulos da roleta (do App.js) */}
         <Typography
           variant="h3"
@@ -135,7 +149,7 @@ export default function PaginaRoleta() {
             textShadow: "0 0 10px rgba(110, 231, 183, 0.5)",
           }}
         >
-           Desafio da Roleta 
+          Desafio da Roleta
         </Typography>
         <Typography sx={{ color: "#b0bec5", mb: 8, fontSize: "1.2rem", textAlign: "center" }}>
           Gire a roleta para descobrir o seu próximo desafio de código!
@@ -186,7 +200,6 @@ export default function PaginaRoleta() {
         >
           {mustSpin ? <CircularProgress size={28} color="inherit" /> : "GIRAR"}
         </Button>
-
       </Box>
 
       {/* --- RODAPÉ (do PaginaExercicios) --- */}
@@ -226,7 +239,6 @@ export default function PaginaRoleta() {
       </Paper>
 
       {/* --- DIALOG DE RESULTADO (Removido) --- */}
-      
     </Box>
   );
 }

@@ -77,43 +77,44 @@ export default function PaginaEditarPerfil() {
   };
 
   const handleUpdateProfile = async (e) => {
-    e.preventDefault(); 
+    e.preventDefault();
     setLoading(true);
     try {
-        // CORREÇÃO: URL e MÉTODO CORRETOS
-        const response = await fetch(`${API_URL}/update_profile/${userEmail}`, { 
-            method: 'PUT', // <-- CORRIGIDO
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ // Envia APENAS nome e telefone
-                nome: formData.nome,
-                telefone: formData.telefone
-            }),
-        });
+      // CORREÇÃO: URL e MÉTODO CORRETOS
+      const response = await fetch(`${API_URL}/update_profile/${userEmail}`, {
+        method: "PUT", // <-- CORRIGIDO
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          // Envia APENAS nome e telefone
+          nome: formData.nome,
+          telefone: formData.telefone,
+        }),
+      });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.detail || "Falha ao atualizar perfil.");
-        }
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Falha ao atualizar perfil.");
+      }
 
-        const result = await response.json();
+      const result = await response.json();
 
-        if (result.success) {
-            alert("Perfil atualizado com sucesso!");
-            
-            // ATUALIZA o localStorage
-            const updatedUserData = { ...userData, ...formData }; 
-            localStorage.setItem("userData", JSON.stringify(updatedUserData));
+      if (result.success) {
+        alert("Perfil atualizado com sucesso!");
 
-            navigate("/perfil");
-        } else {
-            throw new Error(result.message || "Erro ao atualizar.");
-        }
+        // ATUALIZA o localStorage
+        const updatedUserData = { ...userData, ...formData };
+        localStorage.setItem("userData", JSON.stringify(updatedUserData));
+
+        navigate("/perfil");
+      } else {
+        throw new Error(result.message || "Erro ao atualizar.");
+      }
     } catch (error) {
-        console.error("Erro ao atualizar perfil:", error);
-        alert(`Erro: ${error.message}`);
-        setLoading(false); 
+      console.error("Erro ao atualizar perfil:", error);
+      alert(`Erro: ${error.message}`);
+      setLoading(false);
     }
   };
 
@@ -146,7 +147,7 @@ export default function PaginaEditarPerfil() {
       <AppBar
         position="static"
         sx={{
-          background: "linear-gradient(to right, #1e293b, #334155)",
+          background: "linear-gradient(to right, #1e293b)",
           boxShadow: "none",
         }}
       >
@@ -154,13 +155,7 @@ export default function PaginaEditarPerfil() {
           <IconButton color="inherit" onClick={handleGoBack} sx={{ mr: 2 }}>
             <BackIcon />
           </IconButton>
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ flexGrow: 1, fontWeight: "bold" }}
-          >
-            Editar Perfil
-          </Typography>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: "bold" }}></Typography>
           <IconButton color="inherit" onClick={handleLogout}>
             <Logout />
           </IconButton>
@@ -168,11 +163,7 @@ export default function PaginaEditarPerfil() {
       </AppBar>
 
       <Box className="perfil-content">
-        <Typography
-          variant="h4"
-          gutterBottom
-          sx={{ color: "white", fontWeight: "bold", mb: 3 }}
-        >
+        <Typography variant="h4" gutterBottom sx={{ color: "white", fontWeight: "bold", mb: 3 }}>
           Atualize seus dados
         </Typography>
 
@@ -273,8 +264,7 @@ export default function PaginaEditarPerfil() {
           }}
           sx={{
             background: "#1e293b",
-            "& .Mui-selected, & .MuiBottomNavigationAction-label.Mui-selected":
-              { color: "#38b36d" },
+            "& .Mui-selected, & .MuiBottomNavigationAction-label.Mui-selected": { color: "#38b36d" },
             "& .MuiBottomNavigationAction-root": {
               color: "#94a3b8",
             },
