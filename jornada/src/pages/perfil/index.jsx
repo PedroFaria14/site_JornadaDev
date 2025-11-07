@@ -89,7 +89,6 @@ export default function PaginaPerfil() {
     // 2. 👇 AGORA, BUSCA ATUALIZAÇÕES EM SEGUNDO PLANO
     // (Apenas para garantir que os dados fiquem sincronizados com o banco)
     const fetchProfileUpdates = async () => {
-      console.log("Buscando atualizações do perfil em segundo plano...");
       try {
         const response = await fetch(`${API_URL}/profile/${userEmail}`);
         if (!response.ok) {
@@ -103,7 +102,6 @@ export default function PaginaPerfil() {
           setProfileData(result.user);
           localStorage.setItem("userData", JSON.stringify(result.user));
           setFasesCompletas(calculateCompletedPhases(result.user.fases));
-          console.log("Perfil em segundo plano atualizado.", result.user);
         }
       } catch (error) {
         console.error("Erro ao buscar atualizações do perfil:", error);

@@ -1,416 +1,232 @@
-import React, { useRef, useEffect, useState, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
+  AppBar,
+  Toolbar,
   Typography,
+  IconButton,
   Button,
   CircularProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  IconButton,
+
+  Paper,
+  BottomNavigation,
+  BottomNavigationAction,
 } from "@mui/material";
-import { ArrowBack as BackIcon } from "@mui/icons-material";
+import {
+  Settings,
+  Logout,
+  Home as HomeIcon,
+  ListAlt as ExerciciosIcon,
+  OndemandVideo as DicasIcon,
+  Person as PerfilIcon,
+  ArrowBack as BackIcon,
+} from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import "./index.css"; // Reutiliza o CSS do PaginaExercicios
 
-// --- Funções Utilitárias ---
-// Converte graus em radianos
-const degToRad = (deg) => deg * (Math.PI / 180);
+// Importa o componente da roleta
+import CustomWheel from "../CustomWheel/index";
 
-// 🎨 Paleta de Cores & Prêmios (Definida fora dos componentes para evitar recriação)
+// --- Configurações da Roleta (Movido do seu App.js) ---
 const colorPalette = ["#6ee7b7", "#64b5f6", "#ffd54f", "#f08080", "#ba68c8"];
-const textColor = "#1A202C"; // Texto escuro para contraste
-const WHEEL_SIZE = 400; // Tamanho da roleta em pixels
-const outerBorderColor = "#38b36d"; // Cor verde vibrante
+const textColor = "#1A202C";
+const WHEEL_SIZE = 400;
+const outerBorderColor = "#38b36d";
+const pointerColor = "#38b36d"; // Cor da seta (do nosso chat anterior)
 
 const roulettePrizes = [
-  {
-    option: "Funções",
-    fullName: "Funções",
-    style: { backgroundColor: colorPalette[0], textColor: textColor },
-  },
-  {
-    option: "Variáveis",
-    fullName: "Variáveis",
-    style: { backgroundColor: colorPalette[1], textColor: textColor },
-  },
-  {
-    option: "Condicionais",
-    fullName: "Condicionais",
-    style: { backgroundColor: colorPalette[2], textColor: textColor },
-  },
-  {
-    option: "Laços",
-    fullName: "Laços",
-    style: { backgroundColor: colorPalette[3], textColor: textColor },
-  },
-  {
-    option: "Diversos",
-    fullName: "Diversos",
-    style: { backgroundColor: colorPalette[4], textColor: textColor },
-  },
+  {option: "Funções", fullName: "Funções", style: { backgroundColor: colorPalette[0], textColor: textColor } },
+  { option: "Variáveis", fullName: "Variáveis e Tipos de Dados", style: { backgroundColor: colorPalette[1], textColor: textColor } },
+  { option: "Condicionais", fullName: "Condicionais", style: { backgroundColor: colorPalette[2], textColor: textColor } },
+  { option: "Laços", fullName: "Laços de Repetição", style: { backgroundColor: colorPalette[3], textColor: textColor } },
+  { option: "Diversos", fullName: "Perguntas diversas", style: { backgroundColor: colorPalette[4], textColor: textColor } },
 ];
 
-// --- Componente da Roleta Customizada (CustomWheel) ---
-const CustomWheel = ({
-  prizes,
-  mustStartSpinning,
-  prizeNumber,
-  onStopSpinning,
-  spinDuration = 4, // Duração do giro em segundos
-  size,
-  outerBorderColor,
-}) => {
-  const canvasRef = useRef(null);
-  const [rotation, setRotation] = useState(0);
-  const [isSpinning, setIsSpinning] = useState(false);
+// --- Componente da Página ---
+export default function PaginaRoleta() {
+  const navigate = useNavigate();
+  const [userData, setUserData] = useState(null);
+  const [navValue, setNavValue] = useState(1); // Mantém "Exercícios" selecionado
 
-  // Memoizar cálculos para evitar recálculos desnecessários
-  const { totalPrizes, degreesPerSegment, radius } = useMemo(() => {
-    const total = prizes.length;
-    return {
-      totalPrizes: total,
-      degreesPerSegment: 360 / total,
-      radius: size / 2,
-    };
-  }, [prizes.length, size]);
-
-  // 1. Desenhar a roleta (Canvas)
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, size, size);
-
-    // Aplicar a rotação de estado no canvas para desenhar
-    ctx.save();
-    // A rotação é aplicada via CSS, mas se quisermos desenhar algo fixo,
-    // garantimos que o Canvas está no centro correto.
-    // O desenho deve ser refeito sempre que os prêmios ou o tamanho mudam.
-
-    prizes.forEach((prize, index) => {
-      // Calcular ângulos (iniciando em 0, rodando no sentido horário)
-      const startAngle = degToRad(index * degreesPerSegment);
-      const endAngle = degToRad((index + 1) * degreesPerSegment);
-
-      // Desenhar o segmento
-      ctx.beginPath();
-      ctx.moveTo(radius, radius);
-      ctx.arc(radius, radius, radius - 10, startAngle, endAngle);
-      ctx.closePath();
-      ctx.fillStyle = prize.style.backgroundColor;
-      ctx.fill();
-      ctx.strokeStyle = "#fff";
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      // Desenhar o texto (Módulos)
-      ctx.save();
-      ctx.translate(radius, radius);
-      // Rodar para o centro do segmento
-      ctx.rotate(startAngle + degToRad(degreesPerSegment / 2));
-
-      // Ajustar cor e fonte
-      ctx.fillStyle = prize.style.textColor;
-      ctx.font = "bold 16px Inter, sans-serif";
-      ctx.textAlign = "right";
-      ctx.textBaseline = "middle";
-
-      // Posição do texto
-      ctx.fillText(prize.option, radius * 0.75, 0);
-      ctx.restore();
-    });
-
-    // Desenhar o círculo central
-    ctx.beginPath();
-    ctx.arc(radius, radius, 20, 0, 2 * Math.PI);
-    ctx.fillStyle = outerBorderColor;
-    ctx.fill();
-
-    // Desenhar a borda externa
-    ctx.beginPath();
-    ctx.arc(radius, radius, radius, 0, 2 * Math.PI);
-    ctx.strokeStyle = outerBorderColor;
-    ctx.lineWidth = 10;
-    ctx.stroke();
-
-    ctx.restore(); // Restaurar o estado do Canvas
-  }, [prizes, size, degreesPerSegment, radius, outerBorderColor]);
-
-  // 2. Lógica de Animação de Rotação (Giro)
-  useEffect(() => {
-    if (mustStartSpinning && !isSpinning) {
-      setIsSpinning(true);
-      const segmentIndex = totalPrizes - 1 - prizeNumber;
-      const finalDegree = segmentIndex * degreesPerSegment + degreesPerSegment / 2;
-      const minRotations = 10 * 360;
-      const currentOffset = rotation % 360;
-      const rotationNeeded = finalDegree - currentOffset;
-      const normalizedRotationNeeded = rotationNeeded > 0 ? rotationNeeded : rotationNeeded + 360;
-      const totalRotation = minRotations + normalizedRotationNeeded;
-      setRotation(totalRotation);
-
-      const timer = setTimeout(() => {
-        setIsSpinning(false);
-        setRotation(totalRotation % 360);
-        onStopSpinning();
-      }, spinDuration * 1000);
-
-      // ✅ LIMPEZA CORRETA
-      return () => {
-        clearTimeout(timer);
-        setIsSpinning(false);
-      };
-    }
-  }, [mustStartSpinning, prizeNumber]);
-
-  // 3. Estilos de Rotação (Aplicado ao div pai que envolve o Canvas)
-  const wheelStyle = {
-    transition: isSpinning
-      ? `transform ${spinDuration}s cubic-bezier(0.25, 0.1, 0.25, 1)` // Efeito de desaceleração suave
-      : "none",
-    transform: `rotate(${rotation}deg)`,
-  };
-
-  return (
-    <Box
-      sx={{
-        position: "relative",
-        width: size,
-        height: size,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: "50%",
-        boxShadow: `0 0 40px -10px ${outerBorderColor}`,
-      }}
-    >
-      {/* Roleta que Gira */}
-      <div style={wheelStyle}>
-        <canvas ref={canvasRef} width={size} height={size} style={{ display: "block" }} />
-      </div>
-
-      {/* Triângulo indicador (Pointer) - Fixo no topo */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: 0,
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: 0,
-          height: 0,
-          borderLeft: "15px solid transparent",
-          borderRight: "15px solid transparent",
-          borderBottom: `20px solid #f9fafb`, // Ponteiro Branco/Claro
-          filter: `drop-shadow(0 0 5px ${outerBorderColor})`,
-          zIndex: 10,
-        }}
-      ></Box>
-    </Box>
-  );
-};
-
-// --- Componente Principal da Página (App) ---
-export default function App() {
-  // Use um placeholder simples para navegação e dados
-  const navigate = (path) => console.log(`Maps TO: ${path}`);
-  const [userData] = useState({
-    fases: {
-      Funções: 2,
-      Variáveis: 1,
-      // ... outros dados
-    },
-  });
-
-  const [loading, setLoading] = useState(false); // Simulação de carregamento
-
+  // Estado da Roleta (do seu App.js)
   const [mustSpin, setMustSpin] = useState(false);
   const [prizeNumber, setPrizeNumber] = useState(0);
-  const [result, setResult] = useState(null);
+  // const [result, setResult] = useState(null); // <-- Removido (não é mais usado)
 
-  // Hook para simular a navegação e autenticação (adaptado)
+  // Carrega dados do usuário (do PaginaExercicios)
   useEffect(() => {
-    // Aqui seria a lógica de autenticação real
-    setLoading(false);
-  }, []);
+    const data = localStorage.getItem("userData");
+    if (data) {
+      setUserData(JSON.parse(data));
+    } else {
+      navigate("/login");
+    }
+  }, [navigate]);
 
+  // --- Handlers de Navegação (do PaginaExercicios) ---
+  const handleGoBack = () => {
+    navigate("/exercicios"); // Volta para a lista de exercícios
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("userData");
+    navigate("/login");
+  };
+  const goToDicas = () => navigate("/dicas");
+  const goToPerfil = () => navigate("/perfil");
+
+  // --- Handlers da Roleta (do App.js) ---
   const handleSpinClick = () => {
     if (mustSpin) return;
-
-    // 1. Número do prêmio aleatório
     const newPrizeNumber = Math.floor(Math.random() * roulettePrizes.length);
-
-    // 2. Define o prêmio e inicia o giro
     setPrizeNumber(newPrizeNumber);
     setMustSpin(true);
-    setResult(null);
-    console.log(`Girando para o prêmio #${newPrizeNumber} (${roulettePrizes[newPrizeNumber].fullName})`);
+    // setResult(null); // <-- Removido (não é mais usado)
   };
 
   const handleStopSpinning = () => {
     setMustSpin(false);
 
-    // Pega o nome COMPLETO do array
-    const challenge = roulettePrizes[prizeNumber].fullName;
+    // 1. Pega o nome do módulo que a roleta sorteou
+    const nomeModuloSorteado = roulettePrizes[prizeNumber].fullName;
 
-    console.log("A sorte decidiu:", challenge);
-    setResult(challenge);
+    // 2. Pega o level (EXATAMENTE a mesma lógica da PaginaExercicios)
+    //    Isso funciona porque você já carrega o 'userData' no useEffect
+    const levelId = userData?.fases?.[nomeModuloSorteado] || 1;
+
+    // 3. Navega IMEDIATAMENTE (EXATAMENTE a mesma lógica)
+    navigate(`/quiz/${encodeURIComponent(nomeModuloSorteado)}/3`);
   };
 
-  const handleStartChallenge = () => {
-    if (!result) return;
-    const moduleName = result;
-    const levelId = userData?.fases?.[moduleName] || 1;
-
-    console.log(`Iniciando desafio: ${moduleName} no nível ${levelId}`);
-    // Simula a navegação real
-    // navigate(`/quiz/${encodeURIComponent(moduleName)}/${levelId}`);
-    setResult(null); // Fecha o modal
-  };
-
-  if (loading || !userData) {
-    return (
-      <Box className="flex justify-center items-center h-screen bg-gray-900">
-        <CircularProgress color="success" />
-      </Box>
-    );
-  }
+  // const handleStartChallenge = () => { ... }; // <-- Removido (não é mais usado)
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        p: 3,
-        minHeight: "100vh",
-        backgroundColor: "#111827", // Fundo escuro
-        color: "white",
-        fontFamily: "Inter, sans-serif",
-      }}
-    >
-      <IconButton
-        onClick={() => navigate("/exercicios")}
-        sx={{
-          color: "white",
-          position: "absolute",
-          top: 24,
-          left: 24,
-          zIndex: 10,
-          bgcolor: "rgba(56, 179, 109, 0.1)",
-          "&:hover": { bgcolor: "rgba(56, 179, 109, 0.3)" },
-        }}
-      >
-        <BackIcon fontSize="large" />
-      </IconButton>
+    <Box className="perfil-layout">
+      {/* --- CABEÇALHO (do PaginaExercicios) --- */}
+      <AppBar position="static" sx={{ background: "#1e293b", boxShadow: "none" }}>
+        <Toolbar>
+          <IconButton color="inherit" onClick={handleGoBack} sx={{ mr: 1 }}>
+            <BackIcon />
+          </IconButton>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: "bold" }}>
+            Desafio da Roleta 
+          </Typography>
+          <IconButton color="inherit" onClick={() => navigate("/configuracoes")}>
+            <Settings />
+          </IconButton>
+          <IconButton color="inherit" onClick={handleLogout}>
+            <Logout />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
 
-      <Typography
-        variant="h3"
-        sx={{
-          fontWeight: "extrabold",
-          mb: 2,
-          textAlign: "center",
-          color: "#6ee7b7",
-          textShadow: "0 0 10px rgba(110, 231, 183, 0.5)",
-        }}
-      >
-        Desafio da Mistura
-      </Typography>
-      <Typography sx={{ color: "#b0bec5", mb: 8, fontSize: "1.2rem", textAlign: "center" }}>
-        Gire a roleta para descobrir o seu próximo desafio de código!
-      </Typography>
+      {/* --- CONTEÚDO CENTRAL (Roleta do App.js) --- */}
+      {/* Usamos a classe "perfil-content" para centralizar o conteúdo */}
+      <Box className="perfil-content" sx={{ paddingBottom: "72px" }}>
+        
+        {/* Títulos da roleta (do App.js) */}
+        <Typography
+          variant="h3"
+          sx={{
+            fontWeight: "extrabold",
+            mb: 2,
+            textAlign: "center",
+            color: "#6ee7b7",
+            textShadow: "0 0 10px rgba(110, 231, 183, 0.5)",
+          }}
+        >
+           Desafio da Roleta 
+        </Typography>
+        <Typography sx={{ color: "#b0bec5", mb: 8, fontSize: "1.2rem", textAlign: "center" }}>
+          Gire a roleta para descobrir o seu próximo desafio de código!
+        </Typography>
 
-      {/* Container da Roleta */}
-      <Box
-        sx={{
-          position: "relative",
-          width: `${WHEEL_SIZE}px`,
-          height: `${WHEEL_SIZE}px`,
-          mb: 8,
-        }}
-      >
-        <CustomWheel
-          mustStartSpinning={mustSpin}
-          prizeNumber={prizeNumber}
-          prizes={roulettePrizes}
-          onStopSpinning={handleStopSpinning}
-          spinDuration={4}
-          size={WHEEL_SIZE}
-          outerBorderColor={outerBorderColor}
-        />
+        {/* Container da Roleta (do App.js) */}
+        <Box
+          sx={{
+            position: "relative",
+            width: `${WHEEL_SIZE}px`,
+            height: `${WHEEL_SIZE}px`,
+            mb: 8,
+          }}
+        >
+          <CustomWheel
+            mustStartSpinning={mustSpin}
+            prizeNumber={prizeNumber}
+            prizes={roulettePrizes}
+            onStopSpinning={handleStopSpinning}
+            spinDuration={4}
+            size={WHEEL_SIZE}
+            outerBorderColor={outerBorderColor}
+            pointerColor={pointerColor} // Passando a cor da seta
+          />
+        </Box>
+
+        {/* Botão GIRAR (do App.js) */}
+        <Button
+          variant="contained"
+          onClick={handleSpinClick}
+          disabled={mustSpin}
+          sx={{
+            bgcolor: outerBorderColor,
+            color: "#111827",
+            fontWeight: "bold",
+            fontSize: "1.2rem",
+            padding: "12px 48px",
+            borderRadius: "16px",
+            transition: "all 0.3s ease",
+            boxShadow: `0 4px 15px rgba(56, 179, 109, 0.4)`,
+            "&:hover": {
+              bgcolor: "#2f9a5d",
+              transform: "translateY(-2px)",
+              boxShadow: `0 6px 20px rgba(56, 179, 109, 0.6)`,
+            },
+            "&.Mui-disabled": { bgcolor: "#475569", color: "#9e9e9e", boxShadow: "none" },
+          }}
+        >
+          {mustSpin ? <CircularProgress size={28} color="inherit" /> : "GIRAR"}
+        </Button>
+
       </Box>
 
-      {/* Botão GIRAR */}
-      <Button
-        variant="contained"
-        onClick={handleSpinClick}
-        disabled={mustSpin}
+      {/* --- RODAPÉ (do PaginaExercicios) --- */}
+      <Paper
         sx={{
-          bgcolor: outerBorderColor,
-          color: "#111827", // Texto escuro no botão verde
-          fontWeight: "bold",
-          fontSize: "1.2rem",
-          padding: "12px 48px",
-          borderRadius: "16px",
-          transition: "all 0.3s ease",
-          boxShadow: `0 4px 15px rgba(56, 179, 109, 0.4)`,
-          "&:hover": {
-            bgcolor: "#2f9a5d",
-            transform: "translateY(-2px)",
-            boxShadow: `0 6px 20px rgba(56, 179, 109, 0.6)`,
-          },
-          "&.Mui-disabled": { bgcolor: "#475569", color: "#9e9e9e", boxShadow: "none" },
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          background: "#1e293b",
+          zIndex: 100,
+          borderTop: "1px solid #334155",
         }}
+        elevation={0}
       >
-        {mustSpin ? <CircularProgress size={28} color="inherit" /> : "GIRAR"}
-      </Button>
+        <BottomNavigation
+          showLabels
+          value={navValue}
+          onChange={(event, newValue) => {
+            setNavValue(newValue);
+            if (newValue === 0) navigate("/menu");
+            if (newValue === 1) navigate("/exercicios");
+            if (newValue === 2) goToDicas();
+            if (newValue === 3) goToPerfil();
+          }}
+          sx={{
+            background: "transparent",
+            "& .MuiBottomNavigationAction-root": { color: "#94a3b8", minWidth: "auto", padding: "6px 0" },
+            "& .Mui-selected": { color: "#6ee7b7 !important" },
+          }}
+        >
+          <BottomNavigationAction label="Home" icon={<HomeIcon />} />
+          <BottomNavigationAction label="Exercícios" icon={<ExerciciosIcon />} />
+          <BottomNavigationAction label="Dicas" icon={<DicasIcon />} />
+          <BottomNavigationAction label="Perfil" icon={<PerfilIcon />} />
+        </BottomNavigation>
+      </Paper>
 
-      {/* Dialog de Resultado */}
-      <Dialog
-        open={!!result && !mustSpin}
-        keepMounted
-        onClose={handleStartChallenge}
-        PaperProps={{
-          sx: {
-            borderRadius: "16px",
-            background: "#111827",
-            color: "white",
-            border: `3px solid ${outerBorderColor}`,
-            p: 2,
-          },
-        }}
-      >
-        <DialogTitle sx={{ fontWeight: "bold", textAlign: "center", fontSize: "1.8rem" }}>
-          🥳 Desafio Sorteado!
-        </DialogTitle>
-        <DialogContent sx={{ textAlign: "center" }}>
-          <Typography variant="h4" sx={{ fontWeight: "extrabold", color: "#6ee7b7", mb: 2 }}>
-            {result}
-          </Typography>
-          <DialogContentText sx={{ color: "#e0e0e0" }}>
-            Você deve completar o quiz deste módulo para avançar!
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions sx={{ p: 2, justifyContent: "center" }}>
-          <Button
-            onClick={handleStartChallenge}
-            variant="contained"
-            sx={{
-              bgcolor: outerBorderColor,
-              color: "#111827",
-              "&:hover": { bgcolor: "#2f9a5d" },
-              borderRadius: "8px",
-              px: 4,
-              py: 1.5,
-              fontWeight: "bold",
-            }}
-          >
-            Começar Agora!
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {/* --- DIALOG DE RESULTADO (Removido) --- */}
+      
     </Box>
   );
 }

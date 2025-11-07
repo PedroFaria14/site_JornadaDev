@@ -37,7 +37,6 @@ export default function ForgotPasswordPage() {
         throw new Error(result.detail || "Email não encontrado ou falha no envio.");
       }
 
-      console.log("Solicitação enviada:", result.message);
       
       navigate("/reset-password", { state: { email: email } });
       

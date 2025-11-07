@@ -77,7 +77,7 @@ export default function PaginaQuiz() {
         const nivelQuery = levelMap[levelId] || "Facil";
         let url = `${API_URL}/pergunta/?nivel=${nivelQuery}`;
 
-        if (moduleName === "Desafio da Mistura") {
+        if (moduleName === "Desafio da Roleta") {
           url += `&count=5`;
         } else {
           const tipo = moduleNameMapping[moduleName];
@@ -111,14 +111,12 @@ export default function PaginaQuiz() {
     const currentLevelNum = parseInt(levelId, 10);
 
     if (!currentLevelNum || currentLevelNum >= 3) {
-      console.log("Nível máximo (3) já alcançado. Sem atualização.");
       return;
     }
 
     const nextLevelNum = currentLevelNum + 1; 
     const moduleKey = moduleName;
 
-    console.log(`LEVEL UP! Módulo ${moduleKey} agora é nível ${nextLevelNum}`);
 
     const updatedUserData = { ...userData };
 

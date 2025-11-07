@@ -74,7 +74,6 @@ export default function PaginaNivelamento() {
         const urlFacil = `${API_URL}/pergunta/?nivel=${nivelFacil}&count=${COUNT_FACIL}`;
         const urlMedio = `${API_URL}/pergunta/?nivel=${nivelMedio}&count=${COUNT_MEDIO}`;
         
-        console.log("📡 Buscando perguntas de nivelamento...");
 
         const [resFacil, resMedio] = await Promise.all([
            fetch(urlFacil),
@@ -171,7 +170,6 @@ export default function PaginaNivelamento() {
       finalLevelNum = 2;
     }
 
-    console.log(`TESTE FINALIZADO. Nível global: ${finalLevel}. Enviando para o backend...`);
 
     let updatedUserData = { ...userData };
 
@@ -191,7 +189,6 @@ export default function PaginaNivelamento() {
       }
       
       const result = await response.json();
-      console.log("Nível global salvo no backend com sucesso.");
       
       if (result.success && result.user) {
          updatedUserData = result.user; // Pega os dados mais recentes do backend
@@ -208,7 +205,7 @@ export default function PaginaNivelamento() {
     const fases = updatedUserData.fases || {};
     for (const moduleKey in fases) {
       // Não mexe no 'Desafio da Mistura' se ele já tiver progresso
-      if (moduleKey !== "Desafio da Mistura") {
+      if (moduleKey !== "Desafio da Roleta") {
          fases[moduleKey] = finalLevelNum;
       }
     }

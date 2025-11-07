@@ -82,14 +82,12 @@ export default function PaginaDicas() {
       if (fetchedUserData) {
           const userLevel = (fetchedUserData.nivel || 'iniciante').toLowerCase(); 
           
-          console.log("NÍVEL DO USUÁRIO USADO (lower):", userLevel); 
           
           // Filtra APENAS os vídeos que batem com o nível
           const relevantVideos = sampleVideos.filter(video => 
               video.level && video.level.toLowerCase() === userLevel 
           );
           
-          console.log("VÍDEOS RELEVANTES FILTRADOS:", relevantVideos); 
 
           // Agrupa esses vídeos relevantes por categoria
           const groupedRelevantVideos = relevantVideos.reduce((acc, video) => { 

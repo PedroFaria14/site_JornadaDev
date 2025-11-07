@@ -77,7 +77,6 @@ export default function Paginamenu() {
   };
 
   const goToExerciciosQuiz = () => {
-  console.log("NAVEGANDO PARA QUIZ COM moduleName:", moduleName);
   navigate(`/exercicios`); 
 };
 

@@ -32,18 +32,29 @@ export default function PaginaExercicios() {
   const [navValue, setNavValue] = useState(1);
 
   useEffect(() => {
-    const data = localStorage.getItem("userData");
-    if (data) {
-      const user = JSON.parse(data);
-      setUserData(user);
+  const data = localStorage.getItem("userData");
+  if (data) {
+    const user = JSON.parse(data);
+    setUserData(user);
 
-      if (user && user.fases && typeof user.fases === "object") {
-        setModulos(Object.keys(user.fases));
-      }
-    } else {
-      navigate("/login");
-    }
-  }, [navigate]);
+    // --- Aqui estava o problema ---
+    // setModulos(Object.keys(user.fases));
+
+    // --- Solução: defina a lista manualmente ---
+    const modulosFixos = [
+      "Variáveis e Tipos de Dados",
+      "Condicionais",
+      "Laços de Repetição",
+      
+      "Funções",
+      "Perguntas diversas",
+    ];
+    setModulos(modulosFixos);
+  } else {
+    navigate("/login");
+  }
+}, [navigate]);
+
 
   const handleGoBack = () => {
     navigate("/menu");
@@ -67,7 +78,7 @@ export default function PaginaExercicios() {
   };
 
   const handleDesafioClick = () => {
-    const levelId = userData?.fases?.["Desafio da Mistura"] || 1;
+    const levelId = userData?.fases?.["Desafio da Roleta"] || 1;
     navigate(`/roleta`);
   };
 
@@ -154,7 +165,7 @@ export default function PaginaExercicios() {
                 <ModuloIcon sx={{ fontSize: 45, color: "#a78bfa" }} />
                 <Box>
                   <Typography variant="h5" component="div" sx={{ fontWeight: 600 }}>
-                    Desafio da Mistura
+                     Desafio da Roleta 
                   </Typography>
                   <Typography variant="body2" sx={{ color: "#cbd5e1" }}>
                     Ir direto para o quiz

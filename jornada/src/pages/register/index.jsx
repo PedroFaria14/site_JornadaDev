@@ -60,7 +60,6 @@ export default function RegisterPage() {
         throw new Error(errorData.detail || "Falha ao registrar.");
       }
       
-      console.log("Conta criada com sucesso. Fazendo auto-login...");
 
       // --- ETAPA 2: FAZER LOGIN PARA SALVAR OS DADOS LOCALMENTE ---
       const loginResponse = await fetch(`${API_URL}/login`, {
@@ -82,7 +81,6 @@ export default function RegisterPage() {
         // 👇 ESTA É A LINHA CRÍTICA QUE FALTAVA
         localStorage.setItem("userData", JSON.stringify(loginResult.user));
         
-        console.log("Login automático bem-sucedido, navegando para o teste.");
         alert("Conta criada com sucesso! Vamos começar seu teste de nível.");
         
         // Agora sim, a navegação vai funcionar

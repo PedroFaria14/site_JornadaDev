@@ -43,7 +43,6 @@ export default function LoginPage() {
       const result = await response.json();
 
       if (result.success && result.user) {
-        console.log("Login bem-sucedido:", result.user);
 
         localStorage.setItem("userData", JSON.stringify(result.user));
         

@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
+// import { Box } from "@mui/material"; // Não está sendo usado, pode ser removido
 
 // Função utilitária para converter graus em radianos
 const degToRad = (deg) => deg * (Math.PI / 180);
@@ -11,16 +12,17 @@ const CustomWheel = ({
   onStopSpinning,
   spinDuration = 4, // Duração do giro em segundos
   size = 400, // Tamanho da roleta em pixels
-  outerBorderColor = "#38b36d",
+  outerBorderColor = "#0c0b0bff",
+  pointerColor = "#FFFFFF",
 }) => {
   const canvasRef = useRef(null);
   const [rotation, setRotation] = useState(0);
-  const [isSpinning, setIsSpinning] = useState(false);
+  // Removido o estado 'isSpinning', vamos usar 'mustStartSpinning' como a fonte da verdade
   const totalPrizes = prizes.length;
   const degreesPerSegment = 360 / totalPrizes;
   const radius = size / 2;
 
-  // 1. Desenhar a roleta
+  // 1. Desenhar a roleta (Este useEffect está correto)
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -40,80 +42,82 @@ const CustomWheel = ({
       ctx.closePath();
       ctx.fillStyle = prize.style.backgroundColor;
       ctx.fill();
-      ctx.strokeStyle = "#fff"; // Cor da linha divisória
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = "#1b1414ff"; // Cor da linha divisória
+      ctx.lineWidth = 5;
       ctx.stroke();
 
       // Desenhar o texto (Módulos)
       ctx.save();
       ctx.translate(radius, radius);
-      // Rodar para o centro do segmento
       ctx.rotate(startAngle + degToRad(degreesPerSegment / 2));
-
-      // Ajustar cor e fonte
       ctx.fillStyle = prize.style.textColor;
       ctx.font = "bold 16px Arial";
-      ctx.textAlign = "right"; // Alinhar à direita (perto da borda)
+      ctx.textAlign = "right";
       ctx.textBaseline = "middle";
-
-      // Posição do texto (Ajustar o 0.6 para mover para dentro/fora)
       ctx.fillText(prize.option, radius * 0.7, 0);
       ctx.restore();
     });
 
-    // Desenhar o círculo central (Opcional)
+    // Círculo central
     ctx.beginPath();
     ctx.arc(radius, radius, 20, 0, 2 * Math.PI);
     ctx.fillStyle = outerBorderColor;
     ctx.fill();
 
-    // Desenhar a borda externa
+    // Borda externa
     ctx.beginPath();
-    ctx.arc(radius, radius, radius, 0, 2 * Math.PI);
+    ctx.arc(radius, radius, 195, 0, 2 * Math.PI);
     ctx.strokeStyle = outerBorderColor;
     ctx.lineWidth = 10;
     ctx.stroke();
   }, [prizes, size, degreesPerSegment, radius, outerBorderColor]);
 
-  // 2. Lógica de Animação de Rotação
+  // 2. Lógica de Animação de Rotação (CORRIGIDO)
   useEffect(() => {
-    if (mustStartSpinning && !isSpinning) {
-      setIsSpinning(true);
-
-      // 1. Calcular a rotação final em graus
-      const segmentIndex = totalPrizes - 1 - prizeNumber; // Roleta roda no sentido horário, então inverte
+    // Este efeito agora só reage a 'mustStartSpinning'
+    if (mustStartSpinning) {
+      // 1. Calcular a rotação final
+      const segmentIndex = totalPrizes - 1 - prizeNumber;
       const finalDegree = segmentIndex * degreesPerSegment + degreesPerSegment / 2; // Centro do segmento
 
-      // Adiciona muitas voltas para a animação ser visível e suave
-      const totalRotation = 360 * 10 + finalDegree - (rotation % 360);
-
-      // 2. Iniciar a animação (CSS Transition)
-      setRotation(totalRotation);
+      // 2. Usar um callback no setRotation
+      // Isso nos permite obter o 'currentRotation' sem precisar
+      // colocá-lo no array de dependências.
+      setRotation((currentRotation) => {
+        const totalRotation = 360 * 10 + finalDegree - (currentRotation % 360);
+        return totalRotation;
+      });
 
       // 3. Chamar o callback quando a animação terminar
+      // Este temporizador não será mais limpo por re-renders
       const timer = setTimeout(() => {
-        setIsSpinning(false);
-        // Atualiza a rotação de volta para o valor final entre 0 e 360 para a próxima vez
-        setRotation(totalDegree % 360);
         onStopSpinning();
       }, spinDuration * 1000);
 
+      // A função de limpeza só será chamada se o componente for desmontado
+      // ou se mustStartSpinning mudar (o que queremos)
       return () => clearTimeout(timer);
+    } else {
+      // Quando o giro terminar (mustStartSpinning se torna false),
+      // ajustamos a rotação de volta para um valor entre 0-360
+      // para preparar o próximo giro.
+      setRotation((currentRotation) => currentRotation % 360);
     }
   }, [
-    mustStartSpinning,
+    mustStartSpinning, // <-- Única dependência de estado que inicia o giro
     prizeNumber,
     onStopSpinning,
     degreesPerSegment,
     totalPrizes,
     spinDuration,
-    isSpinning,
-    rotation,
   ]);
 
   // 3. Estilos de Rotação
   const wheelStyle = {
-    transition: isSpinning ? `transform ${spinDuration}s cubic-bezier(0.25, 0.1, 0.25, 1)` : "none",
+    // A transição só é aplicada quando 'mustStartSpinning' é true
+    transition: mustStartSpinning
+      ? `transform ${spinDuration}s cubic-bezier(0.25, 0.1, 0.25, 1)`
+      : "none",
     transform: `rotate(${rotation}deg)`,
   };
 
@@ -123,26 +127,18 @@ const CustomWheel = ({
         position: "relative",
         width: size,
         height: size,
-        // Triângulo indicador (Pointer)
-        "&::before": {
-          content: '""',
-          position: "absolute",
-          top: 0,
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: 0,
-          height: 0,
-          borderLeft: "15px solid transparent",
-          borderRight: "15px solid transparent",
-          borderBottom: `20px solid ${outerBorderColor}`, // Cor do ponteiro
-          zIndex: 10,
-        },
       }}
     >
       <div style={wheelStyle}>
-        <canvas ref={canvasRef} width={size} height={size} style={{ display: "block" }} />
+        <canvas
+          ref={canvasRef}
+          width={size}
+          height={size}
+          style={{ display: "block" }}
+        />
       </div>
-      {/* Triângulo indicador (Pointer) - CSS Puro */}
+
+      {/* Triângulo indicador (Pointer) */}
       <div
         style={{
           position: "absolute",
@@ -153,7 +149,7 @@ const CustomWheel = ({
           height: 0,
           borderLeft: "15px solid transparent",
           borderRight: "15px solid transparent",
-          borderBottom: `20px solid ${outerBorderColor}`,
+          borderTop: `40px solid ${pointerColor}`,
           zIndex: 10,
         }}
       ></div>
