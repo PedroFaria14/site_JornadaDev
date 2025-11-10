@@ -1,6 +1,4 @@
-/* index.css (ou perfil.css) */
 
-/* Keyframe para a animação do fundo */
 @keyframes animatedGradient {
   0% {
     background-position: 0% 50%;
@@ -13,7 +11,6 @@
   }
 }
 
-/* Keyframe para o Ponto Focal (Roleta) */
 @keyframes pulseGlowRoleta {
   0% {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), 0 0 5px rgba(139, 92, 246, 0.3);
@@ -26,7 +23,6 @@
   }
 }
 
-/* Keyframe para o fade-in do verso do card */
 @keyframes fadeInContent {
   from {
     opacity: 0;
@@ -42,7 +38,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  width: 100%; /* <-- 1. MUDE DE 100vw PARA 100% (isso mata a barra de rolagem) */
+  width: 100%; 
   background: linear-gradient(-45deg, #0f172a, #1e293b, #0f172a, #38b36d);
   background-size: 400% 400%;
   animation: animatedGradient 15s ease infinite;
@@ -50,8 +46,7 @@
   position: relative;
   color: white;
 
-  /* 2. DELETE ESSA LINHA. É ELA. O VILÃO É ESSE CARA AQUI. */
-  /* overflow: hidden; */
+ 
 }
 
 .perfil-content {
@@ -60,10 +55,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20px 0; /* <-- 3. GARANTA QUE O PADDING LATERAL É ZERO */
+  padding: 20px 0; 
   width: 100%;
   box-sizing: border-box;
-  overflow: visible; /* Isso está certo, deixa o brilho vazar */
+  overflow: visible; 
 }
 
 .perfil-content > div {
@@ -71,11 +66,9 @@
   margin-bottom: 0;
 }
 
-/* --- ESTILOS DO CARD FLIP (MELHORADOS) --- */
 
-/* O Contêiner 3D (para profundidade) */
 .card-container-3d {
-  perspective: 2000px; /* Define a "cena" 3D */
+  perspective: 2000px; 
 }
 
 .flip-card {
@@ -93,31 +86,27 @@
   overflow: visible;
 }
 
-/* Animação de Giro e Profundidade */
 .flip-card:hover {
-  z-index: 10; /* << O card com hover fica NA FRENTE de todos */
+  z-index: 10; 
 }
 .flip-card:hover .card-inner {
   transform: rotateY(180deg) scale(1.1) translateZ(40px);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
-/* Ponto Focal (Roleta) */
 .roleta-card-focal-point {
-  z-index: 5; /* << O card da roleta fica na frente dos outros (mas atrás do hover) */
+  z-index: 5;
 }
-/* A animação de brilho agora é aplicada no card-inner *dentro* do card pai com z-index */
 .roleta-card-focal-point .card-inner {
   animation: pulseGlowRoleta 3s ease-in-out infinite;
 }
 
 .card-inner {
   display: flex;
-  align-items: center; /* 👈 Centraliza verticalmente */
-  justify-content: center; /* 👈 Centraliza horizontalmente */
+  align-items: center; 
+  justify-content: center; 
 }
 
-/* --- ESTILOS DAS FACES --- */
 .card-face {
   position: absolute;
   width: 100%;
@@ -129,12 +118,11 @@
   align-items: center;
   justify-content: center;
   border-radius: 16px;
-  text-align: center; /* 👈 Centraliza o texto e o botão */
+  text-align: center; 
   padding: 20px;
   color: white;
 }
 
-/* Microanimação (Ícone da Frente) */
 .card-front > * {
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
@@ -152,7 +140,6 @@
   padding: 20px;
 }
 
-/* Transição Rica (Fade-in do verso) */
 .card-back > * {
   opacity: 0;
 }
@@ -166,7 +153,6 @@
   animation-delay: 0.6s;
 }
 
-/* Microanimação (Botão) */
 .card-back .MuiButton-root {
   transition: transform 0.3s ease;
 }
@@ -174,9 +160,7 @@
   transform: scale(1.05);
 }
 
-/* Responsividade */
 @media (max-width: 900px) {
-  /* Ponto de quebra do MUI para 'md' */
   .perfil-content > .card-container-3d {
     flex-direction: column;
   }

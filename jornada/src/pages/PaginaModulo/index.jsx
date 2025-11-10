@@ -25,7 +25,7 @@ import {
   PlayArrow as PlayIcon,
 } from "@mui/icons-material";
 import { useNavigate, useParams } from "react-router-dom";
-import "./index.css"; // Lembre de importar o CSS polido
+import "./index.css"; 
 
 const API_URL = "https://projeto-codepath.onrender.com";
 
@@ -80,7 +80,6 @@ export default function Paginamenu() {
     navigate(`/roleta`);
   };
 
-  // --- Funções Auxiliares para Cards ---
   const renderCardFront = (icon, title, iconColor) => (
     <Box
       className="card-face card-front"
@@ -125,9 +124,9 @@ export default function Paginamenu() {
         onClick={onClick}
         sx={{
           mt: 2,
-          bgcolor: iconColor, // Usa a cor do ícone como cor do botão
+          bgcolor: iconColor,
           "&:hover": { bgcolor: iconColor.replace(")", ", 0.8)") },
-          color: "black", // Texto escuro no botão colorido
+          color: "black", 
           fontWeight: "bold",
         }}
       >
@@ -138,7 +137,6 @@ export default function Paginamenu() {
 
   return (
     <Box className="perfil-layout">
-      {/* CABEÇALHO */}
       <AppBar
         position="static"
         sx={{
@@ -157,7 +155,6 @@ export default function Paginamenu() {
         </Toolbar>
       </AppBar>
 
-      {/* CONTEÚDO CENTRAL */}
       <Box className="perfil-content">
         <Typography
           variant="h3"
@@ -165,7 +162,7 @@ export default function Paginamenu() {
           sx={{
             color: "white",
             fontWeight: 800,
-            mb: 2, // Margem diminuída
+            mb: 2, 
             textAlign: "center",
             textShadow: "0 0 10px rgba(110, 231, 183, 0.4)",
           }}
@@ -173,7 +170,6 @@ export default function Paginamenu() {
           O que deseja fazer?
         </Typography>
 
-        {/* Linha de Conexão */}
         <Divider
           sx={{
             width: "100px",
@@ -184,21 +180,19 @@ export default function Paginamenu() {
           }}
         />
 
-        {/* Container para os 3 cards, lado a lado */}
         <Box
-          className="card-container-3d" // Classe para a perspectiva 3D
+          className="card-container-3d"
           sx={{
             width: "100%",
             maxWidth: 1000,
             display: "flex",
-            flexWrap: "wrap", // 👈 permite quebrar linha se não couber
+            flexWrap: "wrap", 
             justifyContent: "center",
             gap: 3,
-            overflow: "visible", // 👈 impede corte 3D e bordas
+            overflow: "visible",
             px: 2,
           }}
         >
-          {/* Card Exercícios */}
           <Card
             className="flip-card"
             sx={{
@@ -229,9 +223,8 @@ export default function Paginamenu() {
             </Box>
           </Card>
 
-          {/* Card Desafio da Roleta */}
           <Card
-            className="flip-card roleta-card-focal-point" // CLASSE MOVIDA PARA CÁ
+            className="flip-card roleta-card-focal-point" 
             sx={{
               width: { xs: "90%", md: "28%" },
               aspectRatio: "1/1",
@@ -241,7 +234,7 @@ export default function Paginamenu() {
             }}
           >
             <Box
-              className="card-inner" // Classe de foco REMOVIDA daqui
+              className="card-inner" 
               sx={{
                 border: "2px solid rgba(139, 92, 246, 0.3)",
                 borderRadius: "16px",
@@ -259,7 +252,6 @@ export default function Paginamenu() {
             </Box>
           </Card>
 
-          {/* Card Dicas */}
           <Card
             className="flip-card"
             sx={{
@@ -291,7 +283,6 @@ export default function Paginamenu() {
         </Box>
       </Box>
 
-      {/* RODAPÉ */}
       <Paper
         sx={{
           position: "fixed",

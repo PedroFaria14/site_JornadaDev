@@ -19,16 +19,14 @@ import {
   Radio,
   RadioGroup,
 } from "@mui/material";
-// 1. IMPORTADO O 'EmojiEvents' (Troféu) para o pop-up final
 import { CheckCircle, Cancel, EmojiEvents as TrophyIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import "./index.css"; // Reutiliza o CSS do quiz
+import "./index.css";
 
 const API_URL = "https://projeto-codepath.onrender.com";
 const COUNT_FACIL = 3;
 const COUNT_MEDIO = 2;
 
-// 2. MAPA DE RESULTADOS (para o pop-up)
 const levelResultsMap = {
   iniciante: {
     title: "Nível Iniciante (1)",
@@ -59,9 +57,8 @@ export default function PaginaNivelamento() {
   const [loading, setLoading] = useState(true);
   const [score, setScore] = useState(0);
 
-  // 3. States para o pop-up final
   const [showResultDialog, setShowResultDialog] = useState(false);
-  const [testResult, setTestResult] = useState("iniciante"); // Guarda o resultado ("iniciante", "intermediario", etc.)
+  const [testResult, setTestResult] = useState("iniciante"); 
 
   // 🔹 Busca o perfil
   useEffect(() => {
@@ -74,7 +71,6 @@ export default function PaginaNivelamento() {
     setUserData(user);
   }, [navigate]);
 
-  // 🔹 Busca as perguntas do teste
   useEffect(() => {
     if (!userData) return;
 
@@ -107,7 +103,7 @@ export default function PaginaNivelamento() {
       } catch (err) {
         console.error("Erro ao buscar perguntas do teste:", err);
         setQuestions([]);
-        navigate("/exercicios"); // Navega se der erro
+        navigate("/exercicios");
       } finally {
         setLoading(false);
       }
@@ -118,7 +114,6 @@ export default function PaginaNivelamento() {
 
   const handleAnswerSelect = (e) => setSelectedAnswer(e.target.value);
 
-  // 🔹 Lógica de submeter (calcula o score)
   const handleAnswerSubmit = async () => {
     if (!selectedAnswer || isSubmitting) return;
     setIsSubmitting(true);
@@ -156,15 +151,14 @@ export default function PaginaNivelamento() {
     const isLastQuestion = currentQuestionIndex + 1 >= questions.length;
 
     if (isLastQuestion) {
-      handleFinishTest(); // Chama a função de finalizar
+      handleFinishTest();
     } else {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
 
-  // 4. FUNÇÃO FINALIZAR (Chama o Backend REAL + Salva Local)
   const handleFinishTest = async () => {
-    setLoading(true); // Mostra tela de "Calculando..."
+    setLoading(true);
 
     const percentage = (score / questions.length) * 100;
     let finalLevel = "iniciante";
@@ -181,7 +175,6 @@ export default function PaginaNivelamento() {
     let updatedUserData = { ...userData };
 
     try {
-      // --- ETAPA 1: SALVAR NO BACKEND ---
       const response = await fetch(`${API_URL}/profile/set-global-level`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -198,19 +191,18 @@ export default function PaginaNivelamento() {
       const result = await response.json();
 
       if (result.success && result.user) {
-        updatedUserData = result.user; // Pega os dados mais recentes do backend
+        updatedUserData = result.user; 
       }
     } catch (error) {
       console.error(error);
-      updatedUserData.nivel = finalLevel; // Salva localmente se o backend falhar
+      updatedUserData.nivel = finalLevel;
     }
 
-    // --- ETAPA 2: SALVAR LOCALMENTE (PARA A APRESENTAÇÃO) ---
     updatedUserData.nivel = finalLevel;
 
     const fases = updatedUserData.fases || {};
     for (const moduleKey in fases) {
-      // Não mexe no 'Desafio da Mistura' se ele já tiver progresso
+    
       if (moduleKey !== "Desafio da Roleta") {
         fases[moduleKey] = finalLevelNum;
       }
@@ -220,18 +212,17 @@ export default function PaginaNivelamento() {
     localStorage.setItem("userData", JSON.stringify(updatedUserData));
     setUserData(updatedUserData);
 
-    setTestResult(finalLevel); // Salva o resultado para o pop-up
+    setTestResult(finalLevel); 
     setLoading(false);
-    setShowResultDialog(true); // 👈 ABRE O POP-UP
+    setShowResultDialog(true); 
   };
 
-  // 5. Função para o botão do pop-up final
   const handleGoToMenu = () => {
     setShowResultDialog(false);
-    navigate("/menu"); // Navega para o menu
+    navigate("/menu"); 
   };
 
-  // --- RENDERIZAÇÕES ---
+ 
 
   if (loading || !userData || !questions.length) {
     let message = "Carregando seu teste de nível...";
@@ -259,7 +250,6 @@ export default function PaginaNivelamento() {
 
   return (
     <Box className="perfil-layout">
-      {/* --- AppBar --- */}
       <AppBar position="static" sx={{ background: "#1e293b", boxShadow: "none" }}>
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: "bold" }}>
@@ -269,7 +259,6 @@ export default function PaginaNivelamento() {
         <LinearProgress variant="determinate" value={progress} color="success" sx={{ height: "6px" }} />
       </AppBar>
 
-      {/* --- Card da Pergunta --- */}
       <Box className="perfil-content" sx={{ justifyContent: "center" }}>
         <Card
           sx={{
@@ -328,7 +317,6 @@ export default function PaginaNivelamento() {
         </Card>
       </Box>
 
-      {/* --- Diálogo de feedback (Acerto/Erro) --- */}
       <Dialog
         open={showFeedbackDialog}
         onClose={handleNext}
@@ -363,17 +351,16 @@ export default function PaginaNivelamento() {
         </DialogActions>
       </Dialog>
 
-      {/* // 6. 👇 Pop-up de Resultado Final 👇
-       */}
+     
       <Dialog
         open={showResultDialog}
-        disableEscapeKeyDown // Impede o usuário de fechar clicando fora
+        disableEscapeKeyDown 
         PaperProps={{
           sx: {
             borderRadius: "16px",
             background: "#111827",
             color: "white",
-            border: `2px solid ${levelResultsMap[testResult].color}`, // Borda com a cor do nível
+            border: `2px solid ${levelResultsMap[testResult].color}`,
             p: 2,
           },
         }}

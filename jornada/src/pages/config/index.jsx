@@ -14,13 +14,13 @@ import {
   Switch,
   BottomNavigation,
   BottomNavigationAction,
-  ListItemButton, // <<< MUDANÇA: Mais moderno que "ListItem button"
-  Dialog, // <<< NOVO: Para o pop-up de "Sair"
+  ListItemButton, 
+  Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Button, // Para o Dialog
+  Button, 
 } from "@mui/material";
 import {
   Settings,
@@ -34,12 +34,12 @@ import {
   Lock as LockIcon,
   Notifications as NotificationsIcon,
   ChevronRight as ArrowRightIcon,
-  HelpOutline as HelpIcon, // <<< NOVO ÍCONE
-  Description as DescriptionIcon, // <<< NOVO ÍCONE
-  PrivacyTip as PrivacyIcon, // <<< NOVO ÍCONE
+  HelpOutline as HelpIcon, 
+  Description as DescriptionIcon, 
+  PrivacyTip as PrivacyIcon, 
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-// 1. Reutilize o CSS do Perfil para manter o layout
+
 import "./index.css";
 
 export default function PaginaConfiguracoes() {
@@ -47,21 +47,18 @@ export default function PaginaConfiguracoes() {
   const [navValue, setNavValue] = useState(null);
   const [notificacoes, setNotificacoes] = useState(true);
 
-  // <<< NOVO: State para controlar o pop-up de "Sair"
   const [dialogAberto, setDialogAberto] = useState(false);
 
-  // --- Funções de Navegação ---
   const handleGoBack = () => {
-    navigate(-1); // Volta para a página anterior
+    navigate(-1); 
   };
 
-  // --- Funções de Ação ---
   const handleAbrirDialogSair = () => {
-    setDialogAberto(true); // Só abre o pop-up
+    setDialogAberto(true); 
   };
 
   const handleFecharDialogSair = () => {
-    setDialogAberto(false); // Fecha o pop-up
+    setDialogAberto(false); 
   };
 
   const handleConfirmarSair = () => {
@@ -70,7 +67,6 @@ export default function PaginaConfiguracoes() {
     navigate("/login");
   };
 
-  // --- Componentes Auxiliares de Estilo ---
   const SectionHeader = ({ title }) => (
     <Typography
       variant="overline"
@@ -81,7 +77,7 @@ export default function PaginaConfiguracoes() {
         display: "block",
         width: "90%",
         maxWidth: 500,
-        margin: "0 auto", // Centraliza o header
+        margin: "0 auto",
       }}
     >
       {title}
@@ -95,7 +91,7 @@ export default function PaginaConfiguracoes() {
         background: "rgba(30, 41, 59, 0.6)",
         border: "1px solid #334155",
         borderRadius: "16px",
-        overflow: "hidden", // Para o ListItemButton não vazar
+        overflow: "hidden", 
         mb: 3,
         width: "90%",
         maxWidth: 500,
@@ -104,7 +100,6 @@ export default function PaginaConfiguracoes() {
       {...props}
     />
   );
-  // --- Fim dos Componentes de Estilo ---
 
   return (
     <Box className="perfil-layout">
@@ -127,9 +122,7 @@ export default function PaginaConfiguracoes() {
       </AppBar>
 
       {/* --- CONTEÚDO CENTRAL --- */}
-      {/* <<< MUDANÇA: 'alignItems' centraliza os ListCards */}
       <Box className="perfil-content" sx={{ alignItems: "center" }}>
-        {/* --- Seção "Conta" --- */}
         <SectionHeader title="Conta" />
         <ListCard>
           <List sx={{ p: 0 }}>
@@ -143,7 +136,6 @@ export default function PaginaConfiguracoes() {
             <Divider component="li" sx={{ bgcolor: "rgba(255,255,255,0.1)" }} />
             <ListItemButton onClick={() => navigate("/mudar-senha")}>
               {" "}
-              {/* Crie esta rota */}
               <ListItemIcon>
                 <LockIcon sx={{ color: "#6ee7b7" }} />
               </ListItemIcon>
@@ -153,13 +145,11 @@ export default function PaginaConfiguracoes() {
           </List>
         </ListCard>
 
-        {/* --- Seção "Preferências" --- */}
         <SectionHeader title="Preferências" />
         <ListCard>
           <List sx={{ p: 0 }}>
             <ListItem>
               {" "}
-              {/* Não é um botão, por isso ListItem normal */}
               <ListItemIcon>
                 <NotificationsIcon sx={{ color: "#6ee7b7" }} />
               </ListItemIcon>
@@ -167,7 +157,7 @@ export default function PaginaConfiguracoes() {
               <Switch
                 checked={notificacoes}
                 onChange={() => setNotificacoes(!notificacoes)}
-                color="success" // Usa a cor do tema
+                color="success" 
                 sx={{
                   "& .MuiSwitch-thumb": { bgcolor: notificacoes ? "#6ee7b7" : "#94a3b8" },
                   "& .Mui-checked + .MuiSwitch-track": {
@@ -179,7 +169,6 @@ export default function PaginaConfiguracoes() {
           </List>
         </ListCard>
 
-        {/* --- Seção "Ajuda" (NOVA) --- */}
         <SectionHeader title="Ajuda & Suporte" />
         <ListCard>
           <List sx={{ p: 0 }}>
@@ -193,7 +182,6 @@ export default function PaginaConfiguracoes() {
           </List>
         </ListCard>
 
-        {/* --- Seção "Sobre" (NOVA) --- */}
         <SectionHeader title="Sobre" />
         <ListCard>
           <List sx={{ p: 0 }}>
@@ -213,38 +201,40 @@ export default function PaginaConfiguracoes() {
           </List>
         </ListCard>
 
-        {/* --- Seção "Ações" --- */}
-        <SectionHeader title="Ações" sx={{ backgroundColor: "transparent" }} />
-        <ListCard
-          sx={{
-            border: "1px solid rgba(220, 38, 38, 0.4)",
-            background: "rgba(30, 41, 59, 0.6)", // 🔹 mesmo fundo dos outros
-            boxShadow: "0 0 12px rgba(220, 38, 38, 0.25)", // 🔹 leve brilho vermelho
-            transition: "all 0.3s ease",
-            "&:hover": {
-              boxShadow: "0 0 20px rgba(220, 38, 38, 0.5)",
-              transform: "translateY(-2px)",
-            },
-          }}
-        >
-          <List sx={{ p: 0 }}>
-            <ListItemButton onClick={handleAbrirDialogSair}>
-              <ListItemIcon>
-                <Logout sx={{ color: "#ef4444" }} />
-              </ListItemIcon>
-              <ListItemText
-                primary="Sair da Conta"
-                sx={{
-                  color: "#fca5a5",
-                  fontWeight: 600,
-                }}
-              />
-            </ListItemButton>
-          </List>
-        </ListCard>
+       <SectionHeader title="Ações" sx={{ backgroundColor: "transparent" }} />
+ <ListCard
+ sx={{
+ border: "1px solid rgba(220, 38, 38, 0.4)",
+ background: "rgba(30, 41, 59, 0.6)", 
+ boxShadow: "0 0 12px rgba(220, 38, 38, 0.25)",
+ transition: "all 0.3s ease",
+ mb: 5, 
+ "&:hover": {
+ boxShadow: "0 0 20px rgba(220, 38, 38, 0.5)",
+ transform: "translateY(-2px)",
+ },
+ }}
+ >
+ <List sx={{ p: 0 }}>
+ <ListItemButton onClick={handleAbrirDialogSair}>
+ <ListItemIcon
+  sx={{ minWidth: 40 }} 
+ >
+  <Logout sx={{ color: "#ef4444" }} />
+ </ListItemIcon>
+ <ListItemText
+  primary="Sair da Conta"
+  sx={{
+  color: "#fca5a5",
+  fontWeight: 600,
+  ml: -1, 
+  }}
+ />
+ </ListItemButton>
+ </List>
+ </ListCard>
       </Box>
 
-      {/* --- RODAPÉ --- */}
       <Paper
         sx={{
           position: "fixed",
@@ -258,7 +248,7 @@ export default function PaginaConfiguracoes() {
       >
         <BottomNavigation
           showLabels
-          value={navValue} // Nenhum ícone ativo
+          value={navValue} 
           onChange={(event, newValue) => {
             setNavValue(newValue);
             if (newValue === 0) navigate("/menu");
@@ -279,7 +269,6 @@ export default function PaginaConfiguracoes() {
         </BottomNavigation>
       </Paper>
 
-      {/* --- NOVO: Pop-up de Confirmação --- */}
       <Dialog
         open={dialogAberto}
         onClose={handleFecharDialogSair}

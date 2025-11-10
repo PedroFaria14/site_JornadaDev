@@ -1,158 +1,168 @@
 import React, { useRef, useEffect, useState } from "react";
-// import { Box } from "@mui/material"; // Não está sendo usado, pode ser removido
 
-// Função utilitária para converter graus em radianos
-const degToRad = (deg) => deg * (Math.PI / 180);
+const degToRad = (deg) => (deg * Math.PI) / 180;
 
-// --- Componente da Roleta Customizada ---
+
 const CustomWheel = ({
-  prizes,
-  mustStartSpinning,
-  prizeNumber,
-  onStopSpinning,
-  spinDuration = 4, // Duração do giro em segundos
-  size = 400, // Tamanho da roleta em pixels
+  prizes = [],
+  mustStartSpinning = false,
+  onStopSpinning = () => {},
+  spinDuration = 4,
+  size = 400,
   outerBorderColor = "#0c0b0bff",
-  pointerColor = "#FFFFFF",
+  pointerColor = "#38b36d",
 }) => {
   const canvasRef = useRef(null);
-  const [rotation, setRotation] = useState(0);
-  // Removido o estado 'isSpinning', vamos usar 'mustStartSpinning' como a fonte da verdade
-  const totalPrizes = prizes.length;
+  const [rotation, setRotation] = useState(0); 
+  const [currentPrize, setCurrentPrize] = useState(null);
+
+  const totalPrizes = Math.max(1, prizes.length);
   const degreesPerSegment = 360 / totalPrizes;
   const radius = size / 2;
 
-  // 1. Desenhar a roleta (Este useEffect está correto)
+  // --- Desenha a roleta ---
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, size, size);
 
+    // Desenha fatias
     prizes.forEach((prize, index) => {
-      // Calcular ângulos
-      const startAngle = degToRad(index * degreesPerSegment);
-      const endAngle = degToRad((index + 1) * degreesPerSegment);
+      const startAngle = degToRad(index * degreesPerSegment - 90); // -90 para começar em cima (12h)
+      const endAngle = degToRad((index + 1) * degreesPerSegment - 90);
 
-      // Desenhar o segmento
       ctx.beginPath();
       ctx.moveTo(radius, radius);
-      ctx.arc(radius, radius, radius - 10, startAngle, endAngle); // -10 para borda interna
+      ctx.arc(radius, radius, radius - 10, startAngle, endAngle);
       ctx.closePath();
-      ctx.fillStyle = prize.style.backgroundColor;
+      ctx.fillStyle = prize.style?.backgroundColor ?? "#ccc";
       ctx.fill();
-      ctx.strokeStyle = "#1b1414ff"; // Cor da linha divisória
-      ctx.lineWidth = 5;
+
+      ctx.strokeStyle = "rgba(0,0,0,0.12)";
+      ctx.lineWidth = 3;
       ctx.stroke();
 
-      // Desenhar o texto (Módulos)
+      // Texto no centro do setor
       ctx.save();
+      const midAngle = (index * degreesPerSegment + degreesPerSegment / 2) - 90;
       ctx.translate(radius, radius);
-      ctx.rotate(startAngle + degToRad(degreesPerSegment / 2));
-      ctx.fillStyle = prize.style.textColor;
-      ctx.font = "bold 16px Arial";
+      ctx.rotate(degToRad(midAngle));
+      ctx.fillStyle = prize.style?.textColor ?? "#111";
+      ctx.font = "bold 14px Arial";
       ctx.textAlign = "right";
       ctx.textBaseline = "middle";
-      ctx.fillText(prize.option, radius * 0.7, 0);
+      ctx.fillText(prize.option, radius * 0.72, 0);
       ctx.restore();
     });
 
-    // Círculo central
+    // círculo central
     ctx.beginPath();
-    ctx.arc(radius, radius, 20, 0, 2 * Math.PI);
+    ctx.arc(radius, radius, 22, 0, Math.PI * 2);
     ctx.fillStyle = outerBorderColor;
     ctx.fill();
 
-    // Borda externa
+    // borda externa
     ctx.beginPath();
-    ctx.arc(radius, radius, 195, 0, 2 * Math.PI);
+    ctx.arc(radius, radius, radius - 3, 0, Math.PI * 2);
     ctx.strokeStyle = outerBorderColor;
-    ctx.lineWidth = 10;
+    ctx.lineWidth = 8;
     ctx.stroke();
   }, [prizes, size, degreesPerSegment, radius, outerBorderColor]);
 
-  // 2. Lógica de Animação de Rotação (CORRIGIDO)
+ 
+  const angularDistance = (a, b) => {
+    const diff = Math.abs(((a - b + 540) % 360) - 180);
+    return diff;
+  };
+
   useEffect(() => {
-    // Este efeito agora só reage a 'mustStartSpinning'
-    if (mustStartSpinning) {
-      // 1. Calcular a rotação final
-      const segmentIndex = totalPrizes - 1 - prizeNumber;
-      const finalDegree = segmentIndex * degreesPerSegment + degreesPerSegment / 2; // Centro do segmento
+    if (!mustStartSpinning) return;
 
-      // 2. Usar um callback no setRotation
-      // Isso nos permite obter o 'currentRotation' sem precisar
-      // colocá-lo no array de dependências.
-      setRotation((currentRotation) => {
-        const totalRotation = 360 * 10 + finalDegree - (currentRotation % 360);
-        return totalRotation;
-      });
+    const extraRotations = 360 * (5 + Math.random() * 4.5);
+    const newRotation = rotation + extraRotations;
 
-      // 3. Chamar o callback quando a animação terminar
-      // Este temporizador não será mais limpo por re-renders
-      const timer = setTimeout(() => {
-        onStopSpinning();
-      }, spinDuration * 1000);
 
-      // A função de limpeza só será chamada se o componente for desmontado
-      // ou se mustStartSpinning mudar (o que queremos)
-      return () => clearTimeout(timer);
-    } else {
-      // Quando o giro terminar (mustStartSpinning se torna false),
-      // ajustamos a rotação de volta para um valor entre 0-360
-      // para preparar o próximo giro.
-      setRotation((currentRotation) => currentRotation % 360);
-    }
-  }, [
-    mustStartSpinning, // <-- Única dependência de estado que inicia o giro
-    prizeNumber,
-    onStopSpinning,
-    degreesPerSegment,
-    totalPrizes,
-    spinDuration,
-  ]);
+    setRotation(newRotation);
 
-  // 3. Estilos de Rotação
+   
+    const timer = setTimeout(() => {
+      const normalized = ((newRotation % 360) + 360) % 360;
+
+      const pointerAngle = 90;
+
+      let bestIndex = 0;
+      let bestDist = 1e9;
+
+      for (let i = 0; i < totalPrizes; i++) {
+        const sectorCenter = (i * degreesPerSegment + degreesPerSegment / 2) - 90;
+        const displayedCenter = ((sectorCenter + normalized) % 360 + 360) % 360;
+        const dist = angularDistance(displayedCenter, pointerAngle);
+        if (dist < bestDist) {
+          bestDist = dist;
+          bestIndex = i;
+        }
+      }
+
+      const landedIndex = bestIndex % totalPrizes;
+      const landedPrize = prizes[landedIndex];
+
+      setCurrentPrize(landedPrize);
+      onStopSpinning(landedPrize, landedIndex);
+    }, spinDuration * 1000);
+
+    return () => clearTimeout(timer);
+   
+  }, [mustStartSpinning]);
+
   const wheelStyle = {
-    // A transição só é aplicada quando 'mustStartSpinning' é true
+    width: size,
+    height: size,
+    transform: `rotate(${rotation}deg)`,
     transition: mustStartSpinning
       ? `transform ${spinDuration}s cubic-bezier(0.25, 0.1, 0.25, 1)`
-      : "none",
-    transform: `rotate(${rotation}deg)`,
+      : "transform 0.2s linear",
   };
 
   return (
-    <div
-      style={{
-        position: "relative",
-        width: size,
-        height: size,
-      }}
-    >
+    <div style={{ position: "relative", width: size, height: size }}>
       <div style={wheelStyle}>
-        <canvas
-          ref={canvasRef}
-          width={size}
-          height={size}
-          style={{ display: "block" }}
-        />
+        <canvas ref={canvasRef} width={size} height={size} style={{ display: "block" }} />
       </div>
 
-      {/* Triângulo indicador (Pointer) */}
+      
       <div
         style={{
           position: "absolute",
-          top: 0,
+          top: "-18px", 
           left: "50%",
-          transform: "translateX(-50%)",
+          transform: "translateX(-50%) rotate(180deg)", 
           width: 0,
           height: 0,
           borderLeft: "15px solid transparent",
           borderRight: "15px solid transparent",
-          borderTop: `40px solid ${pointerColor}`,
-          zIndex: 10,
+          borderTop: `35px solid ${pointerColor}`,
+          zIndex: 50,
         }}
-      ></div>
+      />
+
+      {/* Feedback textual opcional */}
+      {currentPrize && !mustStartSpinning && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: "-48px",
+            width: "100%",
+            textAlign: "center",
+            color: "#6ee7b7",
+            fontWeight: "700",
+            fontSize: "1.05rem",
+            textShadow: "0 0 10px rgba(110,231,183,0.45)",
+          }}
+        >
+          🎉 Caiu em: {currentPrize.option}
+        </div>
+      )}
     </div>
   );
 };

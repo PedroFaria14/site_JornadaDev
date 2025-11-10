@@ -40,7 +40,6 @@ import "./index.css";
 
 const API_URL = "https://projeto-codepath.onrender.com";
 
-// ... (sua função calculateCompletedPhases não muda) ...
 const calculateCompletedPhases = (fases) => {
   let total = 0;
   let completed = 0;
@@ -68,8 +67,8 @@ export default function PaginaPerfil() {
   const [fasesCompletas, setFasesCompletas] = useState("0/0");
 
   // <<< NOVO: States para a foto de perfil local
-  const [profileImage, setProfileImage] = useState(null); // Armazena a URL da foto (local ou da API)
-  const fileInputRef = useRef(null); // Referência para o input de arquivo escondido
+  const [profileImage, setProfileImage] = useState(null); 
+  const fileInputRef = useRef(null); 
 
   useEffect(() => {
     const data = localStorage.getItem("userData");
@@ -83,7 +82,6 @@ export default function PaginaPerfil() {
     setFasesCompletas(calculateCompletedPhases(user.fases));
     setLoading(false);
 
-    // Tenta carregar uma foto de perfil vinda dos dados (se existir)
     if (user.fotoUrl) {
       setProfileImage(user.fotoUrl);
     }
@@ -102,7 +100,6 @@ export default function PaginaPerfil() {
           localStorage.setItem("userData", JSON.stringify(result.user));
           setFasesCompletas(calculateCompletedPhases(result.user.fases));
 
-          // Atualiza a foto também com os dados do banco
           if (result.user.fotoUrl) {
             setProfileImage(result.user.fotoUrl);
           }
@@ -129,7 +126,6 @@ export default function PaginaPerfil() {
   };
 
   const formatarData = (dataISO) => {
-    // ... (função de formatar data não muda) ...
     try {
       if (!dataISO) return "Não informado";
       const data = new Date(dataISO);
@@ -140,33 +136,27 @@ export default function PaginaPerfil() {
     }
   };
 
-  // <<< NOVO: Função para "clicar" no input escondido
   const handleAvatarClick = () => {
     fileInputRef.current.click();
   };
 
-  // <<< NOVO: Função que roda quando o usuário escolhe um arquivo
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      // Cria uma URL local para o arquivo e atualiza o state
       setProfileImage(URL.createObjectURL(file));
-      // NOTA: Aqui você poderia também chamar uma função para
-      // fazer o UPLOAD desse 'file' para o seu backend/S3/Firebase.
+   
     }
   };
 
   return (
     <Box className="home-layout">
-      {/* --- Input de arquivo escondido --- */}
       <input
         type="file"
         ref={fileInputRef}
         onChange={handleFileChange}
         hidden
-        accept="image/png, image/jpeg" // Aceita só imagens
+        accept="image/png, image/jpeg" 
       />
-      {/* --- Fim do Input --- */}
 
       <AppBar
         position="static"
@@ -175,7 +165,6 @@ export default function PaginaPerfil() {
           boxShadow: "none",
         }}
       >
-        {/* ... (Toolbar e AppBar não mudam) ... */}
         <Toolbar>
           <IconButton color="inherit" onClick={handleGoBack} sx={{ mr: 2 }}>
             <BackIcon />
@@ -200,20 +189,19 @@ export default function PaginaPerfil() {
           overflowY: "auto",
           width: "100%",
           padding: "32px 20px 100px 20px",
-          gap: 4, // <<< MUDANÇA: Adiciona 32px de espaço entre CADA item
+          gap: 4, 
         }}
       >
         {loading ? (
           <CircularProgress color="success" sx={{ mt: 5 }} />
         ) : profileData ? (
           <>
-            {/* --- SEÇÃO AVATAR --- */}
-            {/* <<< MUDANÇA: 'mb: 4' removido pois o 'gap' do pai cuida disso */}
+           
             <Box sx={{ textAlign: "center" }}>
               <Avatar
                 alt={profileData.nome}
-                src={profileImage} // <<< MUDANÇA: Usa a foto do state
-                onClick={handleAvatarClick} // <<< NOVO: Clicável
+                src={profileImage} 
+                onClick={handleAvatarClick} 
                 sx={{
                   width: 120,
                   height: 120,
@@ -222,11 +210,11 @@ export default function PaginaPerfil() {
                   mx: "auto",
                   mb: 1,
                   border: "3px solid #6ee7b7",
-                  cursor: "pointer", // <<< NOVO: Mãozinha
-                  "&:hover": { opacity: 0.8 }, // <<< NOVO: Efeito
+                  cursor: "pointer", 
+                  "&:hover": { opacity: 0.8 }, 
                 }}
               >
-                {/* <<< MUDANÇA: Só mostra as iniciais se NÃO TIVER foto */}
+                
                 {!profileImage &&
                   (profileData.nome ? (
                     profileData.nome.charAt(0).toUpperCase()
@@ -258,8 +246,7 @@ export default function PaginaPerfil() {
               </Button>
             </Box>
 
-            {/* --- CARD DE STATS --- */}
-            {/* <<< MUDANÇA: 'mb: 3' removido */}
+           
             <Card
               sx={{
                 width: "100%",
@@ -271,7 +258,6 @@ export default function PaginaPerfil() {
                 border: "1px solid rgba(56, 179, 109, 0.4)",
               }}
             >
-              {/* ... (Card de Stats não muda o conteúdo) ... */}
               <CardContent
                 sx={{
                   display: "flex",
@@ -313,8 +299,7 @@ export default function PaginaPerfil() {
               </CardContent>
             </Card>
 
-            {/* --- CARD DE INFORMAÇÕES --- */}
-            {/* <<< MUDANÇA: 'mb: 4' removido */}
+       
             <Card
               sx={{
                 width: "100%",
@@ -325,7 +310,6 @@ export default function PaginaPerfil() {
                 border: "1px solid rgba(56, 179, 109, 0.4)",
               }}
             >
-              {/* ... (Card de Informações não muda o conteúdo) ... */}
               <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
                 <List>
                   <ListItem>
@@ -367,7 +351,6 @@ export default function PaginaPerfil() {
               </CardContent>
             </Card>
 
-            {/* --- Botão Sair da Conta --- */}
             <Button
               variant="contained"
               color="error"
@@ -396,7 +379,6 @@ export default function PaginaPerfil() {
         )}
       </Box>
 
-      {/* --- RODAPÉ --- */}
       <Paper
         sx={{
           position: "fixed",
@@ -408,7 +390,6 @@ export default function PaginaPerfil() {
         }}
         elevation={3}
       >
-        {/* ... (BottomNavigation não muda) ... */}
         <BottomNavigation
           showLabels
           value={navValue}

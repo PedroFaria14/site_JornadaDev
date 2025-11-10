@@ -115,16 +115,15 @@ export default function PaginaExercicios() {
 
       <Box className="perfil-content" sx={{ paddingBottom: "72px" }}>
         <Box sx={{ width: "100%", maxWidth: 500, display: "flex", flexDirection: "column", gap: 3 }}>
-          {/* MUDANÇA: Título mais chamativo e completo */}
           <Typography
-            variant="h3" // Aumentei para h3
+            variant="h3" 
             gutterBottom
             sx={{
               color: "white",
-              fontWeight: 800, // Mais negrito
+              fontWeight: 800, 
               mb: 7,
               textAlign: "start",
-              textShadow: "0 0 10px rgba(110, 231, 183, 0.4)", // Pequena sombra
+              textShadow: "0 0 10px rgba(110, 231, 183, 0.4)", 
             }}
           >
             Módulos de Estudo

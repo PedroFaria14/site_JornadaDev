@@ -1,6 +1,4 @@
-/* perfil.css (COMPLETO E CENTRALIZADO) */
 
-/* Keyframe para a animação do fundo */
 @keyframes animatedGradient {
   0% {
     background-position: 0% 50%;
@@ -13,7 +11,6 @@
   }
 }
 
-/* Layout principal com fundo animado */
 .perfil-layout {
   display: flex;
   flex-direction: column;
@@ -32,21 +29,19 @@
   flex-direction: column;
   align-items: center;
 
-  /* --- ESSA É A LINHA --- */
-  justify-content: center; /* ANTES: justify-content: flex-start; */
-  /* --- --- */
+  justify-content: center; 
+
 
   padding: 32px 20px 100px 20px;
   width: 100%;
   height: 100%;
   overflow-y: auto;
 }
-/* --- CSS para o Carrossel 3D --- */
 .carousel-3d-wrapper {
   position: relative;
   width: 100%;
   max-width: 400px;
-  height: 350px; /* Alto para o card quadrado */
+  height: 350px; 
   display: flex;
   align-items: center;
   justify-content: center;
@@ -65,12 +60,11 @@
   align-items: center;
 }
 
-/* Base para todos os cards no carrossel */
 .carousel-3d-container .card-3d-hover {
   position: absolute;
   width: 85%;
   height: auto;
-  aspect-ratio: 1 / 1; /* O TRUQUE DO QUADRADO */
+  aspect-ratio: 1 / 1;
   transition: transform 0.6s ease-in-out, opacity 0.6s ease-in-out, z-index 0.6s ease-in-out;
   transform-origin: center center;
   box-sizing: border-box;
@@ -85,7 +79,6 @@
   z-index: 2;
 }
 
-/* Card à direita */
 .carousel-item-right {
   opacity: 0.7;
   transform: translateX(calc(70% - 20px)) rotateY(-55deg) scale(0.8);
@@ -93,7 +86,6 @@
   pointer-events: auto;
 }
 
-/* Card à esquerda */
 .carousel-item-left {
   opacity: 0.7;
   transform: translateX(calc(-70% + 20px)) rotateY(55deg) scale(0.8);
@@ -101,7 +93,6 @@
   pointer-events: auto;
 }
 
-/* Cards escondidos (fora de vista) */
 .carousel-item-hidden {
   opacity: 0;
   pointer-events: none;
@@ -109,7 +100,6 @@
   z-index: 0;
 }
 
-/* Setas do carrossel 3D */
 .carousel-arrow {
   position: absolute;
   top: 50%;
@@ -137,7 +127,6 @@
   right: -30px;
 }
 
-/* --- EFEITO 3D "Tilt" (hover) --- */
 .card-3d-hover {
   perspective: 1000px;
   transition: transform 0.2s ease;
@@ -155,7 +144,6 @@
   transform: scale(1.03);
 }
 
-/* Responsividade */
 @media (max-width: 600px) {
   .carousel-3d-wrapper {
     max-width: 95%;

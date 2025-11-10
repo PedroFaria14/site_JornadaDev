@@ -3,17 +3,15 @@ import {
   Box, AppBar, Toolbar, Typography, IconButton, Card, CardContent,
   Button, LinearProgress, CircularProgress, Dialog, DialogTitle,
   DialogContent, DialogContentText, DialogActions, FormControl,
-  FormControlLabel, Radio, RadioGroup
+  FormControlLabel, Radio, RadioGroup, useTheme,
 } from "@mui/material";
 import {
-  CheckCircle, Cancel, ArrowBack as BackIcon, Settings, Logout
+  CheckCircle, ArrowBack as BackIcon, Settings, Logout, SportsEsports,
 } from "@mui/icons-material";
 import { useNavigate, useParams } from "react-router-dom";
-import "./index.css";
 
-const API_URL = "https://projeto-codepath.onrender.com"; 
+const API_URL = "https://projeto-codepath.onrender.com";
 
-// 🔹 Mapeamento
 const moduleNameMapping = {
   "Variáveis e Tipos de Dados": "Variáveis e Tipos de Dados",
   "Condicionais": "Condicionais",
@@ -24,6 +22,7 @@ const moduleNameMapping = {
 
 export default function PaginaQuiz() {
   const navigate = useNavigate();
+  const theme = useTheme();
   const { moduleName: encodedModuleName, levelId } = useParams();
   const moduleName = decodeURIComponent(encodedModuleName || "");
 
@@ -33,13 +32,11 @@ export default function PaginaQuiz() {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState(null);
-  const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
   const [quizFinished, setQuizFinished] = useState(false);
   const [loading, setLoading] = useState(true);
   const [incorrectQuestions, setIncorrectQuestions] = useState([]);
   const [showRedoDialog, setShowRedoDialog] = useState(false);
 
-  // 🔹 Busca o perfil do usuário
   useEffect(() => {
     const data = localStorage.getItem("userData");
     if (!data) {
@@ -55,7 +52,7 @@ export default function PaginaQuiz() {
         const result = await res.json();
         setUserData(result.success ? result.user : user);
       } catch {
-        setUserData(user); 
+        setUserData(user);
       }
     };
     fetchProfile();
@@ -63,7 +60,6 @@ export default function PaginaQuiz() {
 
   useEffect(() => {
     if (!userData) return;
-
     if (!moduleName || moduleName === "undefined") {
       setQuestions([]);
       setLoading(false);
@@ -77,12 +73,12 @@ export default function PaginaQuiz() {
         const nivelQuery = levelMap[levelId] || "Facil";
         let url = `${API_URL}/pergunta/?nivel=${nivelQuery}`;
 
-        if (moduleName === "Desafio da Roleta") {
+        if (moduleName.includes("Desafio")) {
           url += `&count=5`;
         } else {
           const tipo = moduleNameMapping[moduleName];
           if (!tipo) {
-            console.error(`❌ Módulo "${moduleName}" não encontrado no mapping.`);
+            console.error(`❌ Módulo "${moduleName}" não encontrado.`);
             setQuestions([]);
             setLoading(false);
             return;
@@ -105,42 +101,42 @@ export default function PaginaQuiz() {
       }
     };
     fetchQuestions();
-  }, [userData, moduleName, levelId]); 
+  }, [userData, moduleName, levelId]);
 
   const handleLevelUp = () => {
     const currentLevelNum = parseInt(levelId, 10);
+    if (!currentLevelNum || currentLevelNum >= 3) return;
 
-    if (!currentLevelNum || currentLevelNum >= 3) {
-      return;
-    }
-
-    const nextLevelNum = currentLevelNum + 1; 
+    const nextLevelNum = currentLevelNum + 1;
     const moduleKey = moduleName;
-
-
     const updatedUserData = { ...userData };
 
     if (!updatedUserData.fases) {
       updatedUserData.fases = {};
     }
 
-    updatedUserData.fases[moduleKey] = nextLevelNum;
+    if ((updatedUserData.fases[moduleKey] || 0) < nextLevelNum) {
+      updatedUserData.fases[moduleKey] = nextLevelNum;
+    }
 
     localStorage.setItem("userData", JSON.stringify(updatedUserData));
     setUserData(updatedUserData);
   };
 
   useEffect(() => {
-    if (quizFinished && userData) {
+    if (quizFinished && userData && incorrectQuestions.length === 0) {
       handleLevelUp();
     }
-  }, [quizFinished]);
+  }, [quizFinished, userData, incorrectQuestions]);
 
-
-  const handleAnswerSelect = (e) => setSelectedAnswer(e.target.value);
+  const handleAnswerSelect = (e) => {
+    if (!feedback) {
+      setSelectedAnswer(e.target.value);
+    }
+  };
 
   const handleAnswerSubmit = async () => {
-    if (!selectedAnswer || isSubmitting) return;
+    if (!selectedAnswer || isSubmitting || feedback) return;
     setIsSubmitting(true);
     const currentQuestion = questions[currentQuestionIndex];
 
@@ -154,27 +150,21 @@ export default function PaginaQuiz() {
         }),
       });
 
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.detail || "Erro ao enviar resposta");
-      }
-
       const result = await response.json();
+      if (!response.ok) throw new Error(result.detail || "Erro ao enviar resposta");
 
       if (result.success) {
-        setIncorrectQuestions(prev =>
-          prev.filter(q => q.idPergunta !== currentQuestion.idPergunta)
+        setIncorrectQuestions((prev) =>
+          prev.filter((q) => q.idPergunta !== currentQuestion.idPergunta)
         );
       } else {
-        setIncorrectQuestions(prev => {
-          const isAlreadyInList = prev.some(q => q.idPergunta === currentQuestion.idPergunta);
-          if (isAlreadyInList) return prev;
-          return [...prev, currentQuestion];
+        setIncorrectQuestions((prev) => {
+          const exists = prev.some((q) => q.idPergunta === currentQuestion.idPergunta);
+          return exists ? prev : [...prev, currentQuestion];
         });
       }
-      
+
       setFeedback(result);
-      setShowFeedbackDialog(true);
     } catch (error) {
       console.error(error);
       alert(`Erro: ${error.message}`);
@@ -184,17 +174,15 @@ export default function PaginaQuiz() {
   };
 
   const handleNext = () => {
-    setShowFeedbackDialog(false);
     setSelectedAnswer(null);
     setFeedback(null);
-    
-    const isLastQuestion = currentQuestionIndex + 1 >= questions.length;
 
+    const isLastQuestion = currentQuestionIndex + 1 >= questions.length;
     if (isLastQuestion) {
       if (incorrectQuestions.length > 0) {
         setShowRedoDialog(true);
       } else {
-        setQuizFinished(true); // Acertou 100%!
+        setQuizFinished(true);
       }
     } else {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
@@ -215,8 +203,6 @@ export default function PaginaQuiz() {
   };
 
   const handleGoBack = () => navigate("/exercicios");
-
-
 
   if (loading || !userData) {
     return (
@@ -261,6 +247,75 @@ export default function PaginaQuiz() {
   const question = questions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
 
+  const normalize = (str) => (str || "").toString().trim().toLowerCase();
+
+  const getOptionStyles = (opcao) => {
+    if (!feedback) {
+      return {
+        background: "rgba(255,255,255,0.05)",
+        border: selectedAnswer === opcao ? "2px solid #38b36d" : "2px solid transparent",
+        "&:hover": { background: "rgba(255,255,255,0.1)" },
+        transition: "all 0.25s ease",
+      };
+    }
+
+    const correctAnswer = normalize(
+      feedback.respostaCorreta ||
+        feedback.respostacorreta ||
+        feedback.resposta_correta ||
+        feedback.correta ||
+        feedback.resposta
+    );
+
+    const isCorrect = normalize(opcao) === correctAnswer;
+    const isSelected = normalize(opcao) === normalize(selectedAnswer);
+
+    if (isCorrect) {
+      return {
+        background: "rgba(255,255,255,0.05)",
+        border: "2px solid #38b36d",
+        color: "#38b36d",
+        fontWeight: "bold",
+        boxShadow: "0 0 8px rgba(56,179,109,0.3)",
+      };
+    }
+
+    if (isSelected && !isCorrect) {
+      return {
+        background: "rgba(255,255,255,0.05)",
+        
+        fontWeight: "bold",
+      };
+    }
+
+    return {
+      background: "rgba(255,255,255,0.02)",
+      border: "2px solid transparent",
+      opacity: 0.8,
+      color: "#94a3b8",
+    };
+  };
+
+  const getRadioColor = (opcao) => {
+    if (!feedback)
+      return { color: "#94a3b8", "&.Mui-checked": { color: "#38b36d" } };
+
+    const correctAnswer = normalize(
+      feedback.respostaCorreta ||
+        feedback.respostacorreta ||
+        feedback.resposta_correta ||
+        feedback.correta ||
+        feedback.resposta
+    );
+
+    const isCorrect = normalize(opcao) === correctAnswer;
+    const isSelected = normalize(opcao) === normalize(selectedAnswer);
+
+    if (isCorrect) return { color: "#38b36d" };
+    if (isSelected && !isCorrect) return { color: "#dc2626" };
+    return { color: "#94a3b8" };
+  };
+
   return (
     <Box className="perfil-layout">
       {/* --- AppBar --- */}
@@ -270,7 +325,7 @@ export default function PaginaQuiz() {
             <BackIcon />
           </IconButton>
           <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: "bold" }}>
-            Quiz - {moduleName} 
+            Quiz - {moduleName}
           </Typography>
           <IconButton color="inherit" onClick={() => navigate("/configuracoes")}>
             <Settings />
@@ -281,8 +336,7 @@ export default function PaginaQuiz() {
         </Toolbar>
         <LinearProgress variant="determinate" value={progress} color="success" sx={{ height: "6px" }} />
       </AppBar>
-      
-      {/* --- Card da Pergunta --- */}
+
       <Box className="perfil-content" sx={{ justifyContent: "center" }}>
         <Card sx={{ width: "90%", maxWidth: 700, background: "rgba(18, 25, 49, 0.9)", color: "white", border: "1px solid #334155", borderRadius: "16px", p: { xs: 2, sm: 3 } }}>
           <CardContent>
@@ -295,26 +349,56 @@ export default function PaginaQuiz() {
 
             <FormControl component="fieldset" fullWidth disabled={!!feedback || isSubmitting}>
               <RadioGroup value={selectedAnswer} onChange={handleAnswerSelect}>
-                {question?.opcoes.map((opcao, idx) => (
+                {question?.opcoes?.map((opcao, idx) => (
                   <FormControlLabel
                     key={idx}
                     value={opcao}
-                    control={<Radio sx={{ color: "#94a3b8", "&.Mui-checked": { color: "#38b36d" } }} />}
-                    label={<Typography sx={{ color: "white" }}>{opcao}</Typography>}
+                    control={<Radio sx={getRadioColor(opcao)} />}
+                    label={<Typography sx={{ color: getOptionStyles(opcao).color || "white" }}>{opcao}</Typography>}
                     sx={{
-                      background: "rgba(255, 255, 255, 0.05)",
                       mb: 1.5,
                       borderRadius: "8px",
                       padding: "8px 16px",
-                      border: selectedAnswer === opcao ? "2px solid #38b36d" : "2px solid transparent",
-                      "&:hover": { background: "rgba(255, 255, 255, 0.1)" },
+                      transition: "all 0.3s ease",
+                      ...getOptionStyles(opcao),
                     }}
                   />
                 ))}
               </RadioGroup>
             </FormControl>
 
-            {!feedback && (
+            {feedback ? (
+              <Box
+                sx={{
+                  mt: 4,
+                  p: 3,
+                  borderRadius: "12px",
+                  background: feedback.success ? "rgba(56, 179, 109, 0.1)" : "rgba(220, 38, 38, 0.1)",
+                  border: `1px solid ${feedback.success ? "#38b36d" : "#dc2626"}`,
+                  boxShadow: `0 0 10px ${feedback.success ? "rgba(56, 179, 109, 0.5)" : "rgba(220, 38, 38, 0.5)"}`,
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2, pb: 1, borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
+                  <Box sx={{ color: feedback.success ? "#38b36d" : "#dc2626", mr: 1, fontSize: "2rem", display: "flex" }}>
+                    <SportsEsports sx={{ transform: feedback.success ? "rotate(0deg)" : "rotate(180deg)", transition: "transform 0.5s" }} />
+                  </Box>
+                  <Typography variant="h6" sx={{ fontWeight: "bold", color: feedback.success ? "#38b36d" : "#dc2626" }}>
+                    {feedback.message}
+                  </Typography>
+                </Box>
+
+                <Typography sx={{ color: "#e0e0e0", mb: 3 }}>{feedback.explicacao}</Typography>
+
+                <Button
+                  variant="contained"
+                  onClick={handleNext}
+                  color="success"
+                  sx={{ width: "100%", py: 1.5, fontWeight: "bold", fontSize: "1rem", borderRadius: "12px" }}
+                >
+                  {currentQuestionIndex + 1 < questions.length ? "Próxima Pergunta" : "Finalizar Quiz"}
+                </Button>
+              </Box>
+            ) : (
               <Button
                 variant="contained"
                 color="success"
@@ -329,38 +413,6 @@ export default function PaginaQuiz() {
         </Card>
       </Box>
 
-      {/* --- Diálogo de feedback (Acerto/Erro) --- */}
-      <Dialog
-        open={showFeedbackDialog}
-        onClose={handleNext}
-        PaperProps={{
-          sx: {
-            borderRadius: "16px",
-            background: "#111827",
-            color: "white",
-            border: `2px solid ${feedback?.success ? "#38b36d" : "#dc2626"}`,
-          },
-        }}
-      >
-        <DialogTitle sx={{ display: "flex", alignItems: "center", fontWeight: "bold" }}>
-          {feedback?.success ? <CheckCircle sx={{ color: "#38b36d", mr: 1 }} /> : <Cancel sx={{ color: "#dc2626", mr: 1 }} />}
-          {feedback?.message}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText sx={{ color: "#e0e0e0" }}>{feedback?.explicacao}</DialogContentText>
-        </DialogContent>
-        <DialogActions sx={{ p: 2 }}>
-          <Button
-            onClick={handleNext}
-            variant="contained"
-            sx={{ bgcolor: "#38b36d", "&:hover": { bgcolor: "#2f9a5d" }, borderRadius: "8px" }}
-          >
-            {currentQuestionIndex + 1 < questions.length ? "Próxima Pergunta" : "Finalizar Quiz"}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* --- Diálogo "Refazer os Erros" --- */}
       <Dialog
         open={showRedoDialog}
         onClose={() => setShowRedoDialog(false)}
@@ -373,20 +425,15 @@ export default function PaginaQuiz() {
           },
         }}
       >
-        <DialogTitle sx={{ fontWeight: "bold" }}>
-          Quase lá!
-        </DialogTitle>
+        <DialogTitle sx={{ fontWeight: "bold" }}>Quase lá!</DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ color: "#e0e0e0" }}>
-            Você errou {incorrectQuestions.length} pergunta(s).
+            Você errou {incorrectQuestions.length} pergunta(s).  
             Para dominar este módulo, você precisa acertar todas.
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ p: 2, justifyContent: "space-between" }}>
-          <Button
-            onClick={handleGoBack}
-            sx={{ color: "#94a3b8" }}
-          >
+          <Button onClick={handleGoBack} sx={{ color: "#94a3b8" }}>
             Voltar aos Módulos
           </Button>
           <Button

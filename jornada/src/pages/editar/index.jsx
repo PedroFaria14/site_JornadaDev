@@ -28,7 +28,7 @@ import {
   AccountCircle,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import "./index.css"; // mesmo CSS usado no perfil
+import "./index.css"; 
 
 const API_URL = "https://projeto-codepath.onrender.com";
 
@@ -80,14 +80,12 @@ export default function PaginaEditarPerfil() {
     e.preventDefault();
     setLoading(true);
     try {
-      // CORREÇÃO: URL e MÉTODO CORRETOS
       const response = await fetch(`${API_URL}/update_profile/${userEmail}`, {
         method: "PUT", // <-- CORRIGIDO
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          // Envia APENAS nome e telefone
           nome: formData.nome,
           telefone: formData.telefone,
         }),
@@ -103,7 +101,6 @@ export default function PaginaEditarPerfil() {
       if (result.success) {
         alert("Perfil atualizado com sucesso!");
 
-        // ATUALIZA o localStorage
         const updatedUserData = { ...userData, ...formData };
         localStorage.setItem("userData", JSON.stringify(updatedUserData));
 

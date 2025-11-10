@@ -12,8 +12,8 @@ import {
   VisibilityOff,
   Email,
   Person,
-  Phone, // Ícone de Telefone
-  Cake,  // Ícone de Data de Nascimento
+  Phone, 
+  Cake,  
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import "./index.css"; 
@@ -44,11 +44,9 @@ export default function RegisterPage() {
       return;
     }
 
-    // 1. Prepara os dados para o REGISTRO
     const { confirmarSenha, ...registerData } = formData;
 
     try {
-      // --- ETAPA 1: REGISTRAR A CONTA ---
       const registerResponse = await fetch(`${API_URL}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -61,7 +59,6 @@ export default function RegisterPage() {
       }
       
 
-      // --- ETAPA 2: FAZER LOGIN PARA SALVAR OS DADOS LOCALMENTE ---
       const loginResponse = await fetch(`${API_URL}/login`, {
          method: "POST",
          headers: { "Content-Type": "application/json" },
@@ -78,12 +75,10 @@ export default function RegisterPage() {
       const loginResult = await loginResponse.json();
 
       if (loginResult.success && loginResult.user) {
-        // 👇 ESTA É A LINHA CRÍTICA QUE FALTAVA
         localStorage.setItem("userData", JSON.stringify(loginResult.user));
         
         alert("Conta criada com sucesso! Vamos começar seu teste de nível.");
         
-        // Agora sim, a navegação vai funcionar
         navigate("/teste-nivelamento"); 
 
       } else {
@@ -93,7 +88,6 @@ export default function RegisterPage() {
     } catch (error) {
       console.error("Erro no processo de registro:", error);
       alert(`Erro: ${error.message}`);
-      // Se algo der errado, manda para o login
       if (error.message.includes("Tente logar manualmente")) {
         navigate("/login");
       }
@@ -141,7 +135,6 @@ export default function RegisterPage() {
         </Typography>
 
         <Box component="form" onSubmit={handleRegister}>
-          {/* --- FORMULÁRIO --- */}
 
           <TextField
             name="nome"
