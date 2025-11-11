@@ -25,11 +25,11 @@ import {
   Person as PerfilIcon,
   ArrowBack as BackIcon,
   PlayCircleOutline as PlayIcon,
-  ArrowBackIosNew as ArrowBackIosIcon, // Ícone mais moderno
+  ArrowBackIosNew as ArrowBackIosIcon, 
   ArrowForwardIos as ArrowForwardIosIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion"; // <<< NOVO: Para animações!
+import { motion, AnimatePresence } from "framer-motion"; 
 import "./index.css";
 
 const sampleVideos = [
@@ -348,7 +348,7 @@ export default function PaginaDicas() {
         }, {});
 
         setRelevantVideosByCategory(groupedRelevantVideos);
-        setCurrentCategoryIndex(0); // Garante que começa na primeira categoria
+        setCurrentCategoryIndex(0);
       } else {
         console.error("Não foi possível determinar o nível do usuário.");
         setRelevantVideosByCategory({});
@@ -380,7 +380,7 @@ export default function PaginaDicas() {
   const categories = Object.keys(relevantVideosByCategory);
   const activeCategoryName = categories[currentCategoryIndex];
   const allVideosInCategory = relevantVideosByCategory[activeCategoryName] || [];
-  const videosToShow = allVideosInCategory.slice(0, 3); // Sempre 3 vídeos
+  const videosToShow = allVideosInCategory.slice(0, 3)
 
   const handleNextCategory = () => {
     setCurrentCategoryIndex((prevIndex) => (prevIndex + 1) % categories.length);
@@ -389,21 +389,18 @@ export default function PaginaDicas() {
   const handlePrevCategory = () => {
     setCurrentCategoryIndex((prevIndex) => (prevIndex - 1 + categories.length) % categories.length);
   };
-  // --- FIM das funções de navegação ---
 
-  // --- Função para renderizar um Card de Vídeo ---
   const renderVideoCard = (video) => (
-    // Removido xs={12} para o grid se ajustar melhor no mobile para 1 coluna
     <Grid item sm={4} md={4} key={video.id}>
       <Card
-        component={motion.div} // <<< MUDANÇA: Para animações
+        component={motion.div} 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
         sx={{
-          width: 300, // 🔸 Tamanho fixo (ajusta se quiser mais largo)
-          height: 380, // 🔸 Altura fixa
+          width: 300, 
+          height: 380,
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
@@ -411,11 +408,11 @@ export default function PaginaDicas() {
           color: "white",
           borderRadius: "16px",
           border: "1px solid #334155",
-          boxShadow: "0 0 12px rgba(110, 231, 183, 0.25)", // ✨ Glow sutil verde
+          boxShadow: "0 0 12px rgba(110, 231, 183, 0.25)", 
           transition: "transform 0.25s ease, box-shadow 0.25s ease",
           "&:hover": {
             transform: "translateY(-4px)",
-            boxShadow: "0 0 20px rgba(110, 231, 183, 0.45)", // ✨ Brilha um pouco mais
+            boxShadow: "0 0 20px rgba(110, 231, 183, 0.45)",
           },
         }}
       >
@@ -428,7 +425,6 @@ export default function PaginaDicas() {
         />
         <CardContent sx={{ flexGrow: 1, minHeight: "120px" }}>
           {" "}
-          {/* <<< MUDANÇA: Altura mínima para o conteúdo */}
           <Typography
             gutterBottom
             variant="h6"
@@ -504,13 +500,12 @@ export default function PaginaDicas() {
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
-                  background: "rgba(18, 25, 49, 0.6)", // Fundo mais escuro para o carrossel
+                  background: "rgba(18, 25, 49, 0.6)",
                   borderRadius: "20px",
                   p: { xs: 2, sm: 3 },
                   boxShadow: "0 8px 32px 0 rgba(0,0,0,0.4)",
                 }}
               >
-                {/* --- Carrossel de Categorias --- */}
                 <Box
                   sx={{
                     display: "flex",
@@ -518,7 +513,7 @@ export default function PaginaDicas() {
                     justifyContent: "center",
                     width: "100%",
                     mb: 4,
-                    gap: { xs: 1, sm: 3 }, // Espaçamento adaptável
+                    gap: { xs: 1, sm: 3 }, 
                   }}
                 >
                   <IconButton
@@ -534,7 +529,7 @@ export default function PaginaDicas() {
                   </IconButton>
 
                   <Typography
-                    variant="h4" // Tamanho maior para o título da categoria
+                    variant="h4"
                     component="div"
                     sx={{
                       color: "white",
@@ -560,7 +555,6 @@ export default function PaginaDicas() {
                   </IconButton>
                 </Box>
 
-                {/* --- Indicadores de Categoria (opcional, mas legal) --- */}
                 {categories.length > 1 && (
                   <Box sx={{ display: "flex", justifyContent: "center", mt: -2, mb: 3, gap: 1 }}>
                     {categories.map((_, index) => (
@@ -578,16 +572,13 @@ export default function PaginaDicas() {
                   </Box>
                 )}
 
-                {/* --- GRID DE VÍDEOS DA CATEGORIA ATIVA --- */}
                 <Box sx={{ width: "100%", minHeight: "350px" }}>
                   {" "}
-                  {/* Altura mínima para evitar "pulos" */}
                   {videosToShow.length > 0 ? (
                     <AnimatePresence mode="wait">
                       {" "}
-                      {/* <<< NOVO: Animação ao trocar de categoria */}
                       <motion.div
-                        key={activeCategoryName} // Chave para animar a saída/entrada
+                        key={activeCategoryName} 
                         initial={{
                           opacity: 0,
                           x:
@@ -604,7 +595,7 @@ export default function PaginaDicas() {
                               : -50,
                         }}
                         transition={{ duration: 0.4, ease: "easeOut" }}
-                        style={{ width: "100%" }} // Importante para o Grid funcionar
+                        style={{ width: "100%" }} 
                       >
                         <Grid container spacing={3} sx={{ justifyContent: "center" }}>
                           {videosToShow.map(renderVideoCard)}
